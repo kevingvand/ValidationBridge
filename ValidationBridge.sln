@@ -1,0 +1,57 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.329
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ValiationBridge.Bridge", "ValiationBridge.Bridge\ValiationBridge.Bridge.csproj", "{4C04F99F-D232-4D5F-B615-278B292328FB}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Modules", "Modules", "{83676F1F-9117-4B0F-BEB6-BC2E3F0E6087}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InstrumentModules", "InstrumentModules\InstrumentModules.csproj", "{90C177B9-8D67-4A15-A89A-C6577C83F8B5}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Frameworks", "Frameworks", "{8FB2D25C-DCCC-4178-843C-E39003622E73}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleFramework", "ConsoleFramework\ConsoleFramework.csproj", "{397D4215-E517-49D7-810D-F5B5E6AC489C}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ValidationBridge.Common", "ValidationBridge.Common\ValidationBridge.Common.csproj", "{5AA95FFA-4320-4459-9614-959F2747B4C9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ValidationBridge.Invoker", "ValidationBridge.Invoker\ValidationBridge.Invoker.csproj", "{70B5B22D-DE31-4E36-9C5D-651F6ED8D3F6}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{4C04F99F-D232-4D5F-B615-278B292328FB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4C04F99F-D232-4D5F-B615-278B292328FB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4C04F99F-D232-4D5F-B615-278B292328FB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4C04F99F-D232-4D5F-B615-278B292328FB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{90C177B9-8D67-4A15-A89A-C6577C83F8B5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{90C177B9-8D67-4A15-A89A-C6577C83F8B5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{90C177B9-8D67-4A15-A89A-C6577C83F8B5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{90C177B9-8D67-4A15-A89A-C6577C83F8B5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{397D4215-E517-49D7-810D-F5B5E6AC489C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{397D4215-E517-49D7-810D-F5B5E6AC489C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{397D4215-E517-49D7-810D-F5B5E6AC489C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{397D4215-E517-49D7-810D-F5B5E6AC489C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5AA95FFA-4320-4459-9614-959F2747B4C9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5AA95FFA-4320-4459-9614-959F2747B4C9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5AA95FFA-4320-4459-9614-959F2747B4C9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5AA95FFA-4320-4459-9614-959F2747B4C9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{70B5B22D-DE31-4E36-9C5D-651F6ED8D3F6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{70B5B22D-DE31-4E36-9C5D-651F6ED8D3F6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{70B5B22D-DE31-4E36-9C5D-651F6ED8D3F6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{70B5B22D-DE31-4E36-9C5D-651F6ED8D3F6}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{90C177B9-8D67-4A15-A89A-C6577C83F8B5} = {83676F1F-9117-4B0F-BEB6-BC2E3F0E6087}
+		{397D4215-E517-49D7-810D-F5B5E6AC489C} = {8FB2D25C-DCCC-4178-843C-E39003622E73}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {AFE67FEC-2D1F-4208-937C-123D1865F3BD}
+	EndGlobalSection
+EndGlobal

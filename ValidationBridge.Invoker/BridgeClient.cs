@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO.Pipes;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.IO.Pipes;
 using ValidationBridge.Common;
+using ValidationBridge.Common.Enumerations;
+using ValidationBridge.Common.Messages;
 
 namespace ValidationBridge.Invoker
 {
@@ -19,6 +16,20 @@ namespace ValidationBridge.Invoker
             Stream = new Common.PipeStream(ClientStream);
 
             ClientStream.Connect();
+        }
+
+        public ResultMessage WriteMessage(PipeMessage message)
+        {
+            //TODO: timeout
+            //TODO: errorhandling
+
+            Stream.Write(message.GetBytes());
+            var returnBytes = Stream.Read();
+
+            if (returnBytes.Length <= 0 || (EMessageType)returnBytes[0] != EMessageType.RESULT)
+                return null;
+
+            return ResultMessage.CreateFromBytes(returnBytes);
         }
     }
 }

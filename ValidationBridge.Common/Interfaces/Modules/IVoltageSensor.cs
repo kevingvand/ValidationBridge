@@ -8,7 +8,5 @@ namespace ValidationBridge.Common.Interfaces.Modules
     {
         double GetDCVoltage();
         double GetACVoltage();
-
-        void Blabla(int x, int y);
     }
 }

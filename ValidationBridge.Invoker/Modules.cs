@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using ValidationBridge.Common;
 using ValidationBridge.Common.Interfaces.Modules;
+using ValidationBridge.Common.Messages;
 
 namespace ValidationBridge.Invoker
 {
@@ -23,18 +25,30 @@ namespace ValidationBridge.Invoker
         public static List<string> GetLoadedModules()
         {
             var client = GetClient();
-            client.Stream.WriteString("modules");
-            return client.Stream.ReadString().Split(',').ToList();
-            //return null; //TODO: request from client
+
+            var message = new InvokeMessage(Constants.Commands.GetModules);
+            var result = client.WriteMessage(message);
+
+            return result.Result.Value.ToString().Split(',').ToList();
         }
 
         public static IModule GetModule(string name)
         {
+
+
             return null; //TODO: request from client
         }
 
         public static TModule GetModuleWithType<TModule>(string name)
         {
+            /*
+                * 1. Send GetModuleRequest to  Bridge
+                * 2. Pack in Proxy
+                * 3. Return Proxy element
+            */
+
+            var client = GetClient();
+
             return default(TModule); //TODO: get from client
         }
     }

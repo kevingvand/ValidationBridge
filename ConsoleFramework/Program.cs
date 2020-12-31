@@ -98,18 +98,32 @@ namespace ConsoleFramework
             //Console.ReadKey();
 
 
-            while (true)
-            {
-                var message = Console.ReadLine();
+            //while (true)
+            //{
+            //    var message = Console.ReadLine();
 
-                if (message.ToLower().StartsWith("q")) return;
+            //    if (message.ToLower().StartsWith("q")) return;
 
-                if (message.ToLower().Equals("modules"))
-                {
-                    var modules = Modules.GetLoadedModules();
-                    Console.WriteLine(string.Join(Environment.NewLine, modules));
-                }
-            }
+            //    if (message.ToLower().Equals("modules"))
+            //    {
+            //        var modules = Modules.GetLoadedModules();
+            //        Console.WriteLine(string.Join(Environment.NewLine, modules));
+            //    }
+
+            //    if(message.ToLower().StartsWith("module"))
+            //    {
+            //        var command = message.Split(' ');
+            //        if(command.Length < 2)
+            //        {
+            //            Console.WriteLine("Please specify a module name");
+            //        }
+            //    }
+            //}
+
+            var modules = Modules.GetLoadedModules();
+
+            var multimeter = Modules.GetModuleWithType<IVoltageSensor>("Keithley2000");
+            Console.WriteLine(multimeter.GetACVoltage());
         }
 
         static void PrintModule(IModule module)

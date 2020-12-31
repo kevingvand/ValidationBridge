@@ -8,5 +8,10 @@ namespace ValidationBridge.Common
     {
         public const string ServerName = "ValidationBridge-Server";
         public static readonly Encoding ServerEncoding = new UnicodeEncoding();
+
+        public class Commands
+        {
+            public const string GetModules = "GET_MODULES";
+        }
     }
 }

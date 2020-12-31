@@ -5,6 +5,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using ValidationBridge.Common;
+using ValidationBridge.Common.Enumerations;
+using ValidationBridge.Common.Messages;
 
 namespace ValiationBridge.Bridge
 {
@@ -22,6 +24,30 @@ namespace ValiationBridge.Bridge
         public void WaitForConnection()
         {
             ServerStream.WaitForConnection();
+        }
+
+        public PipeMessage WaitForMessage()
+        {
+            var bytes = Stream.Read();
+
+            if (bytes.Length <= 0) return null;
+
+            var messageType = (EMessageType)bytes[0];
+
+            switch (messageType)
+            {
+                case EMessageType.INVOKE:
+                    return InvokeMessage.CreateFromBytes(bytes);
+                case EMessageType.RESULT:
+                    return ResultMessage.CreateFromBytes(bytes);
+                default:
+                    return null;
+            }
+        }
+
+        public void WriteMessage(PipeMessage message)
+        {
+            Stream.Write(message.GetBytes());
         }
     }
 }

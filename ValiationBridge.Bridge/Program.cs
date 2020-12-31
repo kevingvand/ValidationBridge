@@ -30,6 +30,9 @@ namespace ValiationBridge.Bridge
 
             logService.LogInfo("Client connected.");
 
+            //TODO: create MessageHandler --> responsible for adapters and server communicaiton
+
+
             while(true)
             {
                 var message = server.WaitForMessage();
@@ -54,7 +57,7 @@ namespace ValiationBridge.Bridge
                 if(invokeMessage.InstanceId == Guid.Empty)
                 {
                     // Module management
-                    var loadedModules = string.Join(", ", adapter.LoadedModules.Select(x => x.Name));
+                    var loadedModules = adapter.LoadedModules.Select(x => x.Name).ToArray();
                     var resultMessage = new ResultMessage(new Argument(loadedModules));
                     server.WriteMessage(resultMessage);
                     logService.LogInfo("Done parsing, result was transfered.");

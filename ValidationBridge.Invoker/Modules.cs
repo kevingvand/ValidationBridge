@@ -29,7 +29,7 @@ namespace ValidationBridge.Invoker
             var message = new InvokeMessage(Constants.Commands.GetModules);
             var result = client.WriteMessage(message);
 
-            return result.Result.Value.ToString().Split(',').ToList();
+            return ((string[])result.Result.Value).ToList();
         }
 
         public static IModule GetModule(string name)

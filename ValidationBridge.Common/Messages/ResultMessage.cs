@@ -50,5 +50,10 @@ namespace ValidationBridge.Common.Messages
 
             return new ResultMessage(messageId, argument);
         }
+
+        public override string ToString()
+        {
+            return $"{MessageType} - {Result}";
+        }
     }
 }

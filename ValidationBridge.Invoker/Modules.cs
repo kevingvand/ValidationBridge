@@ -4,8 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using ValidationBridge.Common;
+using ValidationBridge.Common.Enumerations;
 using ValidationBridge.Common.Interfaces.Modules;
 using ValidationBridge.Common.Messages;
+using ValidationBridge.Invoker.Proxy;
 
 namespace ValidationBridge.Invoker
 {
@@ -41,30 +43,26 @@ namespace ValidationBridge.Invoker
 
         public static TModule GetModuleWithType<TModule>(string name)
         {
-            /*
-                * 1. Send GetModuleRequest to  Bridge
-                * 2. Pack in Proxy
-                * 3. Return Proxy element
-            */
-
             var client = GetClient();
             var message = new InvokeMessage(Constants.Commands.GetModule, new Argument(name), new Argument(typeof(TModule).FullName));
-            var result = client.WriteMessage(message);
-
-            var instanceId = (Guid)result.Result.Value;
-
-            var invokeMessage = new InvokeMessage(instanceId, "GetACVoltage");
-            var x = client.WriteMessage(invokeMessage);
-
-            /*
-             * Use Guid to make proxy --> call methods using the GUID
-             */
+            var resultMessage = client.WriteMessage(message);
 
             //TODO: pass interface and make sure module implements interface
-            //TODO: make proxy for handle
+
+            var instanceId = resultMessage.Result.GetValue<Guid>();
+
+            if (resultMessage.Result.Type != EType.HANDLE || resultMessage.Result.GetValue<Guid>() == Guid.Empty)
+            {
+                //TODO: better error handling
+                throw new Exception("Could not create instance of module.");
+            }
+
+            var proxy = new ModuleProxy();
+            proxy.CreateProxy(typeof(TModule), client, instanceId);
+
             //TODO: possibility to retrieve error message
 
-            return default(TModule); //TODO: get from client
+            return proxy.GetModule(typeof(TModule));
         }
     }
 }

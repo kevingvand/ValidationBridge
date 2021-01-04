@@ -9,6 +9,7 @@ using ValidationBridge.Invoker;
 
 namespace ConsoleFramework
 {
+   
     class Program
     {
         static List<MemberInfo> GetMemberInfo(Type type)
@@ -123,12 +124,15 @@ namespace ConsoleFramework
             var modules = Modules.GetLoadedModules();
 
             var multimeter = Modules.GetModuleWithType<IVoltageSensor>("Keithley2000");
-            Console.WriteLine(multimeter.GetACVoltage());
+            Console.WriteLine(multimeter.GetDCVoltage());
+
+            Console.WriteLine(multimeter.GetName());
+
         }
 
         static void PrintModule(IModule module)
         {
-            Console.WriteLine(module.Name + " " + module.Description);
+            Console.WriteLine(module.GetName() + " " + module.GetDescription());
         }
 
 

@@ -45,7 +45,7 @@ namespace ValiationBridge.Bridge.Handlers
         {
             var loadedModules = _adapters
                 .SelectMany(adapter => adapter.LoadedModules)
-                .Select(adapter => adapter.Name).ToArray();
+                .Select(adapter => adapter.GetName()).ToArray();
 
             return new ResultMessage(new Argument(loadedModules));
         }
@@ -70,7 +70,7 @@ namespace ValiationBridge.Bridge.Handlers
             //var loadedModules = _adapters.SelectMany(adapter => adapter.LoadedModules);
             //var module = loadedModules.FirstOrDefault(adapter => adapter.Name.Equals(nameArgument.GetValue<string>()));
 
-            BaseAdapter moduleAdapter = _adapters.FirstOrDefault(adapter => adapter.LoadedModules.Any(loadedModule => loadedModule.Name.Equals(nameArgument.GetValue<string>())));
+            BaseAdapter moduleAdapter = _adapters.FirstOrDefault(adapter => adapter.LoadedModules.Any(loadedModule => loadedModule.GetName().Equals(nameArgument.GetValue<string>())));
 
             if(moduleAdapter == null)
             {

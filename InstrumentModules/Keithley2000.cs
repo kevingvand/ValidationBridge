@@ -7,10 +7,10 @@ using ValidationBridge.Common.Interfaces.Modules;
 
 namespace InstrumentModules
 {
-    public class Keithley2000 : IVoltageSensor
+    public class Keithley2000 : IVoltageSensor, IVoltageSource
     {
-        public string Name => "Keithley2000";
-        public string Description => "Keithley 2000 Multimeter module";
+        public string GetName() => "Keithley2000";
+        public string GetDescription() => "Keithley 2000 Multimeter module";
 
         private Random _random;
 
@@ -38,14 +38,14 @@ namespace InstrumentModules
             return _random.NextDouble() + _random.Next(0, (int)maxDcRange);
         }
 
-        //public void SetACVoltage(double voltage)
-        //{
-        //    maxAcRange = voltage;
-        //}
+        public void SetACVoltage(double voltage)
+        {
+            maxAcRange = voltage;
+        }
 
-        //public void SetDCVoltage(double voltage)
-        //{
-        //    maxDcRange = voltage;
-        //}
+        public void SetDCVoltage(double voltage)
+        {
+            maxDcRange = voltage;
+        }
     }
 }

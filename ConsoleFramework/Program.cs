@@ -140,7 +140,7 @@ namespace ConsoleFramework
 
             var source = Modules.Cast<IVoltageSource>(multimeter);
 
-            source.SetDCVoltage(3.0);
+            source.SetDCVoltage(123.0);
 
             multimeter.GetDCVoltage();
 

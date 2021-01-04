@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using ValidationBridge.Common;
 using ValidationBridge.Common.Enumerations;
 using ValidationBridge.Common.Interfaces.Modules;
@@ -34,17 +32,28 @@ namespace ValidationBridge.Invoker
             return ((string[])result.Result.Value).ToList();
         }
 
+        public static TModule Cast<TModule>(IModule module)
+        {
+            return Cast<TModule>(module.InstanceId);
+        }
+
+        public static TModule Cast<TModule>(Guid instanceId)
+        {
+            var client = GetClient();
+            var proxy = new ModuleProxy(instanceId);
+            proxy.CreateProxy(typeof(TModule), client);
+            return proxy.GetModule(typeof(TModule));
+        }
+
         public static IModule GetModule(string name)
         {
-
-
-            return null; //TODO: request from client
+            return GetModuleWithType<IModule>(name);
         }
 
         public static TModule GetModuleWithType<TModule>(string name)
         {
             var client = GetClient();
-            var message = new InvokeMessage(Constants.Commands.GetModule, new Argument(name), new Argument(typeof(TModule).FullName));
+            var message = new InvokeMessage(Constants.Commands.GetModule, new Argument(name), new Argument(typeof(TModule).AssemblyQualifiedName));
             var resultMessage = client.WriteMessage(message);
 
             //TODO: pass interface and make sure module implements interface
@@ -57,12 +66,7 @@ namespace ValidationBridge.Invoker
                 throw new Exception("Could not create instance of module.");
             }
 
-            var proxy = new ModuleProxy();
-            proxy.CreateProxy(typeof(TModule), client, instanceId);
-
-            //TODO: possibility to retrieve error message
-
-            return proxy.GetModule(typeof(TModule));
+            return Cast<TModule>(instanceId);
         }
     }
 }

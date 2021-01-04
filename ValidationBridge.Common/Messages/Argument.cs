@@ -108,12 +108,17 @@ namespace ValidationBridge.Common.Messages
 
         public static byte[] GetBytes(EType type, dynamic value)
         {
-            switch(type)
+            if(value == null)
+                    return new byte[0];
+
+            switch (type)
             {
                 case EType.STRING:
                     return Constants.ServerEncoding.GetBytes(value);
                 case EType.HANDLE:
                     return ((Guid)value).ToByteArray();
+                case EType.NONE:
+                    return new byte[0];
                 default:
                     return BitConverter.GetBytes(value);
             }

@@ -6,6 +6,7 @@ namespace ValidationBridge.Common.Interfaces.Modules
 {
     public interface IModule
     {
+        Guid InstanceId { get; }
         string GetName();
         string GetDescription();
     }

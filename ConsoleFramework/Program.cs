@@ -123,11 +123,41 @@ namespace ConsoleFramework
 
             var modules = Modules.GetLoadedModules();
 
+            //TODO: possibility to get the same instance with different types (i.e. cast the instance over a method)
+
+            //var multimeter = Modules.GetModule("Keithley2000");
+
+
+            //var multiSource = Modules.CastModule(multimeter, IVoltageSource);
+
+            //IVoltageSource multimeterSource = Modules.CastModule<IVoltageSource>(multimeter);
+            //IVoltageSensor multimeterSensor = Modules.CastModule<IVoltageSensor>(multimeter);
+
+
             var multimeter = Modules.GetModuleWithType<IVoltageSensor>("Keithley2000");
+
+            multimeter.GetDCVoltage();
+
+            var source = Modules.Cast<IVoltageSource>(multimeter);
+
+            source.SetDCVoltage(3.0);
+
+            multimeter.GetDCVoltage();
+
+
+            var otherMultimeter = Modules.GetModuleWithType<IVoltageSource>("Keithley2000");
+
+            otherMultimeter.SetDCVoltage(5);
+
+            for (int i = 0; i < 10; i++)
+                Console.WriteLine(multimeter.GetDCVoltage());
+
+
             Console.WriteLine(multimeter.GetDCVoltage());
 
-            Console.WriteLine(multimeter.GetName());
+            Console.WriteLine(multimeter.GetDescription());
 
+            Console.ReadKey();
         }
 
         static void PrintModule(IModule module)

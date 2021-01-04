@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace ValidationBridge.Common.Enumerations
 {
@@ -51,6 +49,7 @@ namespace ValidationBridge.Common.Enumerations
             else if (type == typeof(char)) return EType.CHAR;
             else if (type == typeof(string)) return EType.STRING;
             else if (type == typeof(Guid)) return EType.HANDLE;
+            else if (type == typeof(void)) return EType.NONE;
             else if (type.IsArray || type == typeof(Array)) return EType.ARRAY;
 
             throw new Exception("Specified type is invalid.");

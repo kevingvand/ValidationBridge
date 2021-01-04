@@ -12,6 +12,8 @@ namespace ValiationBridge.Bridge
 {
     public class BridgeServer
     {
+        public bool IsConnected => ServerStream.IsConnected;
+
         public ValidationBridge.Common.PipeStream Stream { get; set; }
         public NamedPipeServerStream ServerStream { get; set; }
 
@@ -30,7 +32,7 @@ namespace ValiationBridge.Bridge
         {
             var bytes = Stream.Read();
 
-            if (bytes.Length <= 0) return null;
+            if (bytes == null || bytes.Length <= 0) return null;
 
             var messageType = (EMessageType)bytes[0];
 

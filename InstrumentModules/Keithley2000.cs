@@ -9,6 +9,8 @@ namespace InstrumentModules
 {
     public class Keithley2000 : IVoltageSensor, IVoltageSource
     {
+        public Guid InstanceId => Guid.Empty;
+
         public string GetName() => "Keithley2000";
         public string GetDescription() => "Keithley 2000 Multimeter module";
 

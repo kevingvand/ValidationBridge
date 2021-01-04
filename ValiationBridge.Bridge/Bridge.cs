@@ -25,7 +25,6 @@ namespace ValiationBridge.Bridge
 
         public Bridge()
         {
-            Server = new BridgeServer();
             InstanceManager = new InstanceManager();
             ModuleAdapters = new List<BaseAdapter>
             {
@@ -42,6 +41,11 @@ namespace ValiationBridge.Bridge
 
         public void Start()
         {
+            if (Server != null)
+                Server.ServerStream.Close();
+
+            Server = new BridgeServer();
+
             IsTerminated = false;
 
             _logService.LogInfo("Bridge ready, waiting for connection.");
@@ -54,6 +58,13 @@ namespace ValiationBridge.Bridge
             {
                 var messageHandled = false;
                 var message = Server.WaitForMessage();
+
+                if(!Server.IsConnected)
+                {
+                    _logService.LogError("Connection terminated from other end.");
+                    Start();
+                    return;
+                }
 
                 if (message == null)
                 {

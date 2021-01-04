@@ -20,8 +20,14 @@ namespace ValidationBridge.Common.Messages
             this.MethodName = methodName;
         }
 
+        public InvokeMessage(string methodName, params Argument[] arguments)
+            : this(methodName)
+        {
+            this.Arguments = arguments;
+        }
+
         public InvokeMessage(Guid instanceId, string methodName)
-            :this(methodName)
+            : this(methodName)
         {
             this.InstanceId = instanceId;
         }

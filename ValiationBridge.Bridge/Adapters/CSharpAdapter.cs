@@ -11,9 +11,23 @@ namespace ValiationBridge.Bridge.Adapters
     public class CSharpAdapter : BaseAdapter
     {
         public CSharpAdapter()
+            : base()
         {
-            LoadedModules = new List<IModule>();
-            LoadedModules.Add(new Keithley2000()); //TODO: instance should be created on the fly (multiple instances needed)
+            LoadedModules = new List<IModule>
+            {
+                new Keithley2000() //TODO: instance should be created on the fly (multiple instances needed)
+            };
+        }
+
+        public override Guid CreateModuleInstance(string name)
+        {
+            if (name.Equals("Keithley2000"))
+            {
+                var instance = new Keithley2000();
+                return InstanceManager.CreateInstance(instance);
+            }
+
+            return Guid.Empty;
         }
     }
 }

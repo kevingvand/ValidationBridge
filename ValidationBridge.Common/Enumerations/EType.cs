@@ -13,7 +13,8 @@ namespace ValidationBridge.Common.Enumerations
         DOUBLE = 4,
         CHAR = 8,
         STRING = 16,
-        ARRAY = 32
+        ARRAY = 32,
+        HANDLE = 64,
     }
 
     public static class ETypeExtension
@@ -34,6 +35,8 @@ namespace ValidationBridge.Common.Enumerations
                     return typeof(string);
                 case EType.ARRAY:
                     return typeof(Array);
+                case EType.HANDLE:
+                    return typeof(Guid);
                 case EType.NONE:
                 default:
                     throw new Exception("Specified type is invalid.");

@@ -50,7 +50,18 @@ namespace ValidationBridge.Common.Messages
         public Argument(bool[] value)
             : this(EType.ARRAY | EType.BOOL, value) { }
 
+        public Argument(Guid value)
+            : this(EType.HANDLE, value) { }
+
+        public Argument(Guid[] value)
+            : this(EType.ARRAY | EType.HANDLE, value) { }
+
         #endregion
+
+        public TType GetValue<TType>()
+        {
+            return (TType) Value;
+        }
 
         public byte[] GetBytes()
         {
@@ -81,7 +92,7 @@ namespace ValidationBridge.Common.Messages
 
         private byte[] GetValueArray(EType type, dynamic value, bool isArrayElement = false)
         {
-            var valueArray = type.HasFlag(EType.STRING) ? Constants.ServerEncoding.GetBytes(value) : BitConverter.GetBytes(value);
+            var valueArray = GetBytes(type, value);
             var resultArray = new byte[valueArray.Length + (isArrayElement ? 2 : 3)];
 
             var blockLength = (byte)(valueArray.Length / 256);
@@ -93,6 +104,19 @@ namespace ValidationBridge.Common.Messages
 
             valueArray.CopyTo(resultArray, isArrayElement ? 2 : 3);
             return resultArray;
+        }
+
+        public static byte[] GetBytes(EType type, dynamic value)
+        {
+            switch(type)
+            {
+                case EType.STRING:
+                    return Constants.ServerEncoding.GetBytes(value);
+                case EType.HANDLE:
+                    return ((Guid)value).ToByteArray();
+                default:
+                    return BitConverter.GetBytes(value);
+            }
         }
 
         public static object GetValue(EType type, byte[] bytes)
@@ -109,6 +133,8 @@ namespace ValidationBridge.Common.Messages
                     return BitConverter.ToBoolean(bytes, 0);
                 case EType.CHAR:
                     return BitConverter.ToChar(bytes, 0);
+                case EType.HANDLE:
+                    return new Guid(bytes);
                 default:
                     return null;
             }

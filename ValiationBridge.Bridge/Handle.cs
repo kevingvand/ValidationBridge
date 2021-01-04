@@ -8,6 +8,11 @@ namespace ValiationBridge.Bridge
 
         public object Instance { get; private set; }
 
+        public Handle(object instance)
+        {
+            this.HandleType = instance.GetType();
+            this.Instance = instance;
+        }
         public Handle(Type handleType, object instance)
         {
             this.HandleType = handleType;

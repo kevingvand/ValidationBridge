@@ -48,6 +48,12 @@ namespace ValidationBridge.Invoker
             */
 
             var client = GetClient();
+            var message = new InvokeMessage(Constants.Commands.GetModule, new Argument(name), new Argument(typeof(TModule).FullName));
+            var result = client.WriteMessage(message);
+
+            //TODO: pass interface and make sure module implements interface
+            //TODO: make proxy for handle
+            //TODO: possibility to retrieve error message
 
             return default(TModule); //TODO: get from client
         }

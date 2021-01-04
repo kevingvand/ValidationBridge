@@ -12,6 +12,7 @@ namespace ValidationBridge.Common
         public class Commands
         {
             public const string GetModules = "GET_MODULES";
+            public const string GetModule = "GET_MODULE";
         }
     }
 }

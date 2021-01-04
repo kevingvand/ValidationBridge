@@ -25,6 +25,14 @@ namespace ValiationBridge.Bridge
             return instanceId;
         }
 
+        public Guid CreateInstance(object instance)
+        {
+            var instanceId = Guid.NewGuid();
+            Instances.Add(instanceId, new Handle(instance));
+
+            return instanceId;
+        }
+
         public void CleanInstance(Guid instance)
         {
             if (Instances.ContainsKey(instance))

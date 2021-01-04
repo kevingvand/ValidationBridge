@@ -51,6 +51,15 @@ namespace ValidationBridge.Invoker
             var message = new InvokeMessage(Constants.Commands.GetModule, new Argument(name), new Argument(typeof(TModule).FullName));
             var result = client.WriteMessage(message);
 
+            var instanceId = (Guid)result.Result.Value;
+
+            var invokeMessage = new InvokeMessage(instanceId, "GetACVoltage");
+            var x = client.WriteMessage(invokeMessage);
+
+            /*
+             * Use Guid to make proxy --> call methods using the GUID
+             */
+
             //TODO: pass interface and make sure module implements interface
             //TODO: make proxy for handle
             //TODO: possibility to retrieve error message

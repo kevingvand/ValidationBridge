@@ -14,7 +14,7 @@ namespace ValidationBridge.Common.Messages
 
         private Argument() { }
 
-        private Argument(EType type, object value)
+        public Argument(EType type, object value)
         {
             this.Type = type;
             this.Value = value;

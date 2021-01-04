@@ -23,6 +23,11 @@ namespace InstrumentModules
             return connectionString.Contains("GPIB");
         }
 
+        public Keithley2000()
+        {
+            _random = new Random(Guid.NewGuid().GetHashCode());
+        }
+
         public double GetACVoltage()
         {
             return _random.NextDouble() + _random.Next(20, (int)maxAcRange);

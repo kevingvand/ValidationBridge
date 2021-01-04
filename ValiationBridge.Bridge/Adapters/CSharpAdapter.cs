@@ -1,9 +1,6 @@
 ﻿using InstrumentModules;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using ValidationBridge.Common.Interfaces.Modules;
 
 namespace ValiationBridge.Bridge.Adapters
@@ -19,15 +16,13 @@ namespace ValiationBridge.Bridge.Adapters
             };
         }
 
-        public override Guid CreateModuleInstance(string name)
+        public override IModule GetModule(string name)
         {
             if (name.Equals("Keithley2000"))
             {
-                var instance = new Keithley2000();
-                return InstanceManager.CreateInstance(instance);
+                return new Keithley2000();
             }
-
-            return Guid.Empty;
+            return null;
         }
     }
 }

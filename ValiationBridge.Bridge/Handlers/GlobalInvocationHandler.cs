@@ -15,11 +15,13 @@ namespace ValiationBridge.Bridge.Handlers
     public class GlobalInvocationHandler : MessageHandler
     {
         private LogService _logService;
+        private InstanceManager _instanceManager;
         private List<BaseAdapter> _adapters;
 
-        public GlobalInvocationHandler(List<BaseAdapter> adapters)
+        public GlobalInvocationHandler(InstanceManager instanceManager, List<BaseAdapter> adapters)
         {
             _logService = new LogService();
+            _instanceManager = instanceManager;
             _adapters = adapters;
         }
 
@@ -76,7 +78,8 @@ namespace ValiationBridge.Bridge.Handlers
                 return null;
             }
 
-            var instanceId = moduleAdapter.CreateModuleInstance(nameArgument.GetValue<string>());
+            var moduleInstance = moduleAdapter.GetModule(nameArgument.GetValue<string>());
+            var instanceId = _instanceManager.CreateInstance(moduleInstance);
             return new ResultMessage(new Argument(instanceId));
 
             //TODO: check for 2nd argument (type) (if specified, else just return IModule?)

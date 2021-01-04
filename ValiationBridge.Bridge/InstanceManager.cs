@@ -33,6 +33,12 @@ namespace ValiationBridge.Bridge
             return instanceId;
         }
 
+        public Handle GetInstance(Guid instanceId)
+        {
+            if (!Instances.ContainsKey(instanceId)) return null;
+            return Instances[instanceId];
+        }
+
         public void CleanInstance(Guid instance)
         {
             if (Instances.ContainsKey(instance))

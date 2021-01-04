@@ -18,12 +18,15 @@ namespace ValiationBridge.Bridge
 
         public BridgeServer Server { get; set; }
 
+        public InstanceManager InstanceManager { get; set; }
+
         public List<BaseAdapter> ModuleAdapters { get; set; }
         public List<MessageHandler> MessageHandlers { get; set; }
 
         public Bridge()
         {
             Server = new BridgeServer();
+            InstanceManager = new InstanceManager();
             ModuleAdapters = new List<BaseAdapter>
             {
                 new CSharpAdapter()
@@ -32,7 +35,8 @@ namespace ValiationBridge.Bridge
             _logService = new LogService();
             MessageHandlers = new List<MessageHandler>()
             {
-                new GlobalInvocationHandler(ModuleAdapters)
+                new GlobalInvocationHandler(InstanceManager, ModuleAdapters),
+                new ModuleInvocationHandler(InstanceManager),
             };
         }
 

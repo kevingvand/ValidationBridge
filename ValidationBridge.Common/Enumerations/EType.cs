@@ -42,5 +42,18 @@ namespace ValidationBridge.Common.Enumerations
                     throw new Exception("Specified type is invalid.");
             }
         }
+
+        public static EType FromSystemType(Type type)
+        {
+            if (type == typeof(int)) return EType.INT;
+            else if (type == typeof(bool)) return EType.BOOL;
+            else if (type == typeof(double)) return EType.DOUBLE;
+            else if (type == typeof(char)) return EType.CHAR;
+            else if (type == typeof(string)) return EType.STRING;
+            else if (type == typeof(Guid)) return EType.HANDLE;
+            else if (type.IsArray || type == typeof(Array)) return EType.ARRAY;
+
+            throw new Exception("Specified type is invalid.");
+        }
     }
 }

@@ -25,6 +25,12 @@ namespace InstrumentModules
             return connectionString.Contains("GPIB");
         }
 
+
+        public bool ConnectGPIB(int gpibPort, int gpibIndex)
+        {
+            return gpibPort == 0 && gpibIndex < 5;
+        }
+
         public Keithley2000()
         {
             _random = new Random(Guid.NewGuid().GetHashCode());

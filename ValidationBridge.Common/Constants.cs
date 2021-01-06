@@ -7,6 +7,7 @@ namespace ValidationBridge.Common
     public class Constants
     {
         public const string ServerName = "ValidationBridge-Server";
+        public const string DefaultAssemblyModuleName = "Main";
         public static readonly Encoding ServerEncoding = new UnicodeEncoding();
 
         public class Commands

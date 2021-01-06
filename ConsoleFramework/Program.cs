@@ -1,15 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Dynamic;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Reflection;
 using ValidationBridge.Common.Interfaces.Modules;
 using ValidationBridge.Invoker;
 
 namespace ConsoleFramework
 {
-   
+
     class Program
     {
         static List<MemberInfo> GetMemberInfo(Type type)
@@ -136,7 +134,10 @@ namespace ConsoleFramework
 
             var multimeter = Modules.GetModuleWithType<IVoltageSensor>("Keithley2000");
 
-            multimeter.GetDCVoltage();
+            //var aa = multimeter.ConnectGPIB(0, 9);
+            var aa = multimeter.Connect("ssPIB");
+
+            var ab = multimeter.GetDCVoltage();
 
             var source = Modules.Cast<IVoltageSource>(multimeter);
 

@@ -47,7 +47,7 @@ namespace ValidationBridge.Invoker
 
         public static IModule GetModule(string name)
         {
-            return GetModuleWithType<IModule>(name);
+            return (IModule) GetModuleWithType<IModule>(name);
         }
 
         public static TModule GetModuleWithType<TModule>(string name)

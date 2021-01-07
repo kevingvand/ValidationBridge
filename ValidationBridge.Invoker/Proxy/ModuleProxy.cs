@@ -56,23 +56,19 @@ namespace ValidationBridge.Invoker.Proxy
 
             var moduleInfo = GetMemberInfo(typeof(TModule));
 
-            foreach (var moduleMember in moduleInfo)
-            {
-                if (moduleMember.MemberType == MemberTypes.Method)
-                    CreateMethodProxy((MethodInfo)moduleMember, target, _instanceId);
+            var methods = moduleInfo.Where(info => info.MemberType == MemberTypes.Method);
+            var properties = moduleInfo.Where(info => info.MemberType == MemberTypes.Property);
 
-                if (moduleMember.MemberType == MemberTypes.Property)
-                    CreatePropertyProxy((PropertyInfo)moduleMember, target, _instanceId);
-            }
+            foreach(var method in methods)
+                CreateMethodProxy((MethodInfo)method, target, _instanceId);
+
+            foreach(var property in properties)
+                    CreatePropertyProxy((PropertyInfo)property, target, _instanceId);
         }
 
         private void CreateMethodProxy(MethodInfo info, BridgeClient target, Guid instanceId)
         {
-            //TODO: check if method is not a property getter / setter.
-
             if (_definedMembers.ContainsKey(info.Name)) return; //TODO: error handling if 2 methods with same name
-
-            if (info.Attributes.HasFlag(MethodAttributes.SpecialName)) return;
 
             var parameterTypes = info.GetParameters().Select(parameter => parameter.ParameterType).ToArray();
             var parameterCount = parameterTypes.Length;
@@ -100,7 +96,7 @@ namespace ValidationBridge.Invoker.Proxy
             var proxyCallExpression = Expression.Call(Expression.Constant(proxyBody.Target), proxyBody.Method, Expression.NewArrayInit(typeof(object), proxyInputs));
             var proxyCallDelegate = Expression.Lambda(proxyCallExpression, proxyInputs).Compile();
 
-            var methodFieldName = $"_{char.ToLowerInvariant(info.Name[0])}{info.Name.Substring(1)}";
+            var methodFieldName = GetFieldName(info.Name);
             var methodField = _typeBuilder.DefineField(methodFieldName, typeof(ProxyFunction), FieldAttributes.Private);
 
             MethodBuilder methodBuilder = _typeBuilder.DefineMethod(info.Name, MethodAttributes.Public | MethodAttributes.Virtual, info.ReturnType, parameterTypes);
@@ -136,7 +132,7 @@ namespace ValidationBridge.Invoker.Proxy
 
         private void CreatePropertyProxy(PropertyInfo info, BridgeClient target, Guid instanceId)
         {
-            //TODO: implement...
+            PropertyBuilder propertyBuilder = _typeBuilder.DefineProperty(info.Name, PropertyAttributes.HasDefault, info.PropertyType, Type.EmptyTypes);
         }
 
         private List<MemberInfo> GetMemberInfo(Type type)
@@ -157,9 +153,8 @@ namespace ValidationBridge.Invoker.Proxy
             ModuleBuilder moduleBuilder = assemblyBuilder.DefineDynamicModule(Constants.DefaultAssemblyModuleName);
             TypeBuilder typeBuilder = moduleBuilder.DefineType(typeSignature, TypeAttributes.Public | TypeAttributes.Class);
 
-            //TODO: generalize in function.
             string instanceIdName = nameof(IModule.InstanceId);
-            string instanceIdFieldName = $"_{char.ToLowerInvariant(instanceIdName[0])}{instanceIdName.Substring(1)}";
+            string instanceIdFieldName = GetFieldName(instanceIdName);
             FieldBuilder instanceIdFieldBuilder = typeBuilder.DefineField(instanceIdFieldName, typeof(Guid), FieldAttributes.Private);
             PropertyBuilder instanceIdPropertyBuilder = typeBuilder.DefineProperty(instanceIdName, PropertyAttributes.HasDefault, typeof(Guid), null);
             MethodBuilder instanceIdGetMethodBuilder = typeBuilder.DefineMethod($"get_{instanceIdName}", MethodAttributes.Public | MethodAttributes.Virtual | MethodAttributes.SpecialName | MethodAttributes.HideBySig, typeof(Guid), Type.EmptyTypes);
@@ -185,6 +180,11 @@ namespace ValidationBridge.Invoker.Proxy
                     .GetField(fieldName, BindingFlags.NonPublic | BindingFlags.Instance)
                     .SetValue(proxyInstance, value);
             };
+        }
+
+        private string GetFieldName(string name)
+        {
+            return $"_{char.ToLowerInvariant(name[0])}{name.Substring(1)}";
         }
     }
 }

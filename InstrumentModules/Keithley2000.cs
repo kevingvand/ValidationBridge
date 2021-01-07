@@ -25,7 +25,6 @@ namespace InstrumentModules
             return connectionString.Contains("GPIB");
         }
 
-
         public bool ConnectGPIB(int gpibPort, int gpibIndex)
         {
             return gpibPort == 0 && gpibIndex < 5;

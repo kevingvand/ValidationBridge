@@ -133,7 +133,6 @@ namespace ConsoleFramework
 
 
             var multimeter = Modules.GetModuleWithType<IVoltageSensor>("Keithley2000");
-
             //var aa = multimeter.ConnectGPIB(0, 9);
             var aa = multimeter.Connect("ssPIB");
 

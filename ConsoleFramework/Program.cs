@@ -119,7 +119,6 @@ namespace ConsoleFramework
             //    }
             //}
 
-            var modules = Modules.GetLoadedModules();
 
             //TODO: possibility to get the same instance with different types (i.e. cast the instance over a method)
 
@@ -131,8 +130,13 @@ namespace ConsoleFramework
             //IVoltageSource multimeterSource = Modules.CastModule<IVoltageSource>(multimeter);
             //IVoltageSensor multimeterSensor = Modules.CastModule<IVoltageSensor>(multimeter);
 
+            var loadedModules = Modules.LoadModule(@"C:\Users\Asus\Documents\Development\ValidationBridge\ValidationBridge\InstrumentModules\bin\Debug\InstrumentModules.dll");
 
-            var multimeter = Modules.GetModuleWithType<IVoltageSensor>("Keithley2000");
+            var modules = Modules.GetLoadedModules();
+
+            var test = Modules.GetModuleWithType<IVoltageSource>("Keithley2000");
+
+            var multimeter = Modules.GetModuleWithType<IVoltageSensor>("Keithley2400");
             //var aa = multimeter.ConnectGPIB(0, 9);
             var aa = multimeter.Connect("ssPIB");
 
@@ -140,7 +144,7 @@ namespace ConsoleFramework
 
             var source = Modules.Cast<IVoltageSource>(multimeter);
 
-            source.SetDCVoltage(123.0);
+            source.SetDCVoltage(123.5);
 
             multimeter.GetDCVoltage();
 

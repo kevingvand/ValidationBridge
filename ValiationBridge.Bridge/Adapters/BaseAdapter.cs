@@ -17,5 +17,7 @@ namespace ValiationBridge.Bridge.Adapters
         }
 
         public abstract IModule GetModule(string name);
+
+        public abstract List<string> LoadModule(string modulePath);
     }
 }

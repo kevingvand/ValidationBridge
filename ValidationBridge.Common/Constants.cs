@@ -15,6 +15,8 @@ namespace ValidationBridge.Common
             public const string GetModules = "GET_MODULES";
             public const string GetModule = "GET_MODULE";
             public const string GetModuleInterfaces = "GET_MODULE_INTERFACES";
+            public const string LoadModule = "LOAD_MODULE";
+            public const string LoadModules = "LOAD_MODULES";
         }
     }
 }

@@ -30,8 +30,8 @@ namespace ValiationBridge.Bridge.Handlers
             var method = instance.HandleType.GetMethod(invokeMessage.MethodName);
             if(method == null)
             {
-                _logService.LogError("Could not invoke method on module, method not found!");
-                return null;
+                var errorMessage = new ErrorMessage("Could not invoke method on module, method not found!");
+                return errorMessage;
             }
 
             var parameters = invokeMessage.Arguments.Select(argument => argument.Value).ToArray();

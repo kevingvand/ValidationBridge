@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.Composition;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -7,7 +8,8 @@ using ValidationBridge.Common.Interfaces.Modules;
 
 namespace InstrumentModules
 {
-    public class Keithley2000 : IVoltageSensor, IVoltageSource
+    [Export(typeof(IModule))]
+    public class Keithley2000 : IVoltageSensor
     {
         public Guid InstanceId => Guid.Empty;
 
@@ -43,16 +45,6 @@ namespace InstrumentModules
         public double GetDCVoltage()
         {
             return _random.NextDouble() + _random.Next(0, (int)maxDcRange);
-        }
-
-        public void SetACVoltage(double voltage)
-        {
-            maxAcRange = voltage;
-        }
-
-        public void SetDCVoltage(double voltage)
-        {
-            maxDcRange = voltage;
         }
     }
 }

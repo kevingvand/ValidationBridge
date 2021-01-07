@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using ValiationBridge.Bridge.Adapters;
 using ValiationBridge.Bridge.Services;
@@ -30,6 +31,10 @@ namespace ValiationBridge.Bridge.Handlers
 
             switch (invokeMessage.MethodName)
             {
+                case Constants.Commands.LoadModule:
+                    return LoadModule(invokeMessage.Arguments);
+                case Constants.Commands.LoadModules:
+                    return LoadModules(invokeMessage.Arguments);
                 case Constants.Commands.GetModules:
                     return GetModules();
                 case Constants.Commands.GetModule:
@@ -39,6 +44,47 @@ namespace ValiationBridge.Bridge.Handlers
                 default:
                     return null;
             }
+        }
+
+        private PipeMessage LoadModules(Argument[] arguments)
+        {
+            if (arguments.Length < 1)
+                return GetErrorMessage("Unable to load modules, no path specified");
+
+            var argument = arguments[0];
+            if (argument.Type != EType.STRING)
+                return GetErrorMessage($"Unable to load modules, path specified but in wrong format (got {argument.Type}), expected {EType.STRING}).");
+
+            throw new NotImplementedException();
+            //TODO: finish implementing (load modules for all files in folder)
+        }
+
+        private PipeMessage LoadModule(Argument[] arguments)
+        {
+            if (arguments.Length < 1)
+                return GetErrorMessage("Unable to load module, no path specified");
+
+            var argument = arguments[0];
+            if (argument.Type != EType.STRING)
+                return GetErrorMessage($"Unable to load module, path specified but in wrong format (got {argument.Type}), expected {EType.STRING}).");
+
+            string modulePath = argument.GetValue<string>();
+            if (!File.Exists(modulePath))
+                return GetErrorMessage($"Unable to load module, specified file does not exist ({modulePath}).");
+
+            List<string> loadedModules = new List<string>();
+            foreach (var adapter in _adapters)
+            {
+                var loadedModule = adapter.LoadModule(modulePath);
+                if (loadedModule != null)
+                    loadedModules.AddRange(loadedModule);
+            }
+
+            if (loadedModules.Count == 0)
+                _logService.LogWarning("Specified path did not contain any valid modules to load.");
+            else
+                _logService.LogInfo($"Successfully loaded {loadedModules.Count} module(s).");
+            return new ResultMessage(new Argument(loadedModules.ToArray()));
         }
 
         private ResultMessage GetModules()
@@ -51,84 +97,76 @@ namespace ValiationBridge.Bridge.Handlers
         }
 
         //TODO: split into 2: Get module (retrieves an already created module) and Create Module (creates a new instance of a module)
-        private ResultMessage GetModule(Argument[] arguments)
+        private PipeMessage GetModule(Argument[] arguments)
         {
             if (arguments.Length < 1)
-            {
-                _logService.LogError("Unable to retrieve module, no name specified");
-                return null;
-            }
+                return GetErrorMessage("Unable to retrieve module, no name specified");
 
-            var argument = arguments[0];
-            if(argument.Type != EType.STRING)
-            {
-                _logService.LogError($"Unable to retrieve module, name specified but in wrong format (got {argument.Type}), expected {EType.STRING}).");
-                return null;
-            }
+            if (arguments.Length < 2)
+                return GetErrorMessage("Unable to retrieve module, no type specified");
 
-            IModule moduleInstance = GetModuleInstanceByName(argument.GetValue<string>());
+            var nameArgument = arguments[0];
+            if (nameArgument.Type != EType.STRING)
+                return GetErrorMessage($"Unable to retrieve module, name specified but in wrong format (got {nameArgument.Type}), expected {EType.STRING}).");
 
-            //TODO: replace once real adapter is in place.
-            //var loadedModules = _adapters.SelectMany(adapter => adapter.LoadedModules);
-            //var module = loadedModules.FirstOrDefault(adapter => adapter.Name.Equals(nameArgument.GetValue<string>()));
+            var typeArgument = arguments[1];
+            if (nameArgument.Type != EType.STRING)
+                return GetErrorMessage($"Unable to retrieve module, type specified but in wrong format (got {typeArgument.Type}), expected {EType.STRING}).");
 
-            var instanceId = _instanceManager.CreateInstance(moduleInstance);
-            return new ResultMessage(new Argument(instanceId));
+            var type = Type.GetType(typeArgument.GetValue<string>());
+            if (type == null)
+                return GetErrorMessage("Unable to retrieve module, type specified does not exist.");
+
+
+            var moduleName = nameArgument.GetValue<string>();
+
+
+            return GetModuleInstanceByName(moduleName, type);
 
             //TODO: check for 2nd argument (type) (if specified, else just return IModule?)
         }
 
-        private IModule GetModuleInstanceByName(string name)
+        private PipeMessage GetModuleInstanceByName(string name, Type type)
         {
             BaseAdapter moduleAdapter = _adapters.FirstOrDefault(adapter => adapter.LoadedModules.Any(loadedModule => loadedModule.GetName().Equals(name)));
 
             if (moduleAdapter == null)
-            {
-                _logService.LogError($@"Unable to retrieve module, module with name: ""{name}"" not found.");
-                return null;
-            }
+                return GetErrorMessage($@"Unable to retrieve module, module with name: ""{name}"" not found.");
 
-            return moduleAdapter.GetModule(name);
+            IModule moduleInstance = moduleAdapter.GetModule(name);
+
+            if (moduleInstance == null)
+                return GetErrorMessage($@"Unable to retrieve module, module with name ""{name}"" exists, but was not able to load.");
+
+            var implementedInterface = moduleInstance.GetType().GetInterface(type.Name);
+            if (implementedInterface == null)
+                return GetErrorMessage($@"Unable to retrieve module, the specified module cannot be used as ""{type.Name}""");
+
+            var instanceId = _instanceManager.CreateInstance(moduleInstance);
+            return new ResultMessage(new Argument(instanceId));
         }
 
-        private IModule GetModuleInstanceByInstanceId(Guid instanceId)
-        {
-            var instance = _instanceManager.GetInstance(instanceId);
-            
-            if(instance == null)
-            {
-                _logService.LogError($@"Instance with id: ""{instanceId}"" not found.");
-                return null;
-            }
-
-            return instance.Instance as IModule;
-        }
-
-        private ResultMessage GetModuleInterfaces(Argument[] arguments)
+        private PipeMessage GetModuleInterfaces(Argument[] arguments)
         {
             if (arguments.Length < 1)
-            {
-                _logService.LogError("Unable to retrieve module instance, no identifier specified");
-                return null;
-            }
+                return GetErrorMessage("Unable to retrieve module instance, no identifier specified");
 
             var instanceIdArgument = arguments[0];
             if (instanceIdArgument.Type != EType.HANDLE)
-            {
-                _logService.LogError($"Unable to retrieve module instance, identifier specified but in wrong format (got {instanceIdArgument.Type}), expected {EType.HANDLE}).");
-                return null;
-            }
+                return GetErrorMessage($"Unable to retrieve module instance, identifier specified but in wrong format (got {instanceIdArgument.Type}), expected {EType.HANDLE}).");
 
             var instance = _instanceManager.GetInstance(instanceIdArgument.GetValue<Guid>());
-            if(instance == null)
-            {
-                _logService.LogError($"No instance found with the specified Id ({instanceIdArgument.GetValue<Guid>()})");
-                return null;
-            }
+            if (instance == null)
+                return GetErrorMessage($"No instance found with the specified Id ({instanceIdArgument.GetValue<Guid>()})");
 
             var interfaces = instance.HandleType.GetInterfaces().Select(moduleInterface => moduleInterface.AssemblyQualifiedName);
             return new ResultMessage(new Argument(interfaces.ToArray()));
         }
 
+        private ErrorMessage GetErrorMessage(string message)
+        {
+            var errorMessage = new ErrorMessage(message);
+            return errorMessage;
+        }
     }
 }

@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using ValiationBridge.Bridge.Adapters;
 using ValiationBridge.Bridge.Handlers;
 using ValiationBridge.Bridge.Services;
+using ValidationBridge.Common.Messages;
 
 namespace ValiationBridge.Bridge
 {
@@ -77,7 +78,11 @@ namespace ValiationBridge.Bridge
                     var resultMessage = handler.HandleMessages(message);
                     if(resultMessage != null)
                     {
-                        _logService.LogInfo($"Message received, answer: {resultMessage}");
+                        if (resultMessage.MessageType == ValidationBridge.Common.Enumerations.EMessageType.ERROR)
+                            _logService.LogError(((ErrorMessage)resultMessage).Message);
+                        else
+                            _logService.LogInfo($"Message received, answer: {resultMessage}");
+
                         Server.WriteMessage(resultMessage);
                         messageHandled = true;
                         continue;

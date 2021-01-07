@@ -81,11 +81,13 @@ namespace ValidationBridge.Invoker.Proxy
 
                 if (result == null || result.MessageType != EMessageType.RESULT)
                 {
+                    return null;
                     //TODO: error handling
-                    throw new Exception("Invalid return message received from target.");
+                    //throw new Exception("Invalid return message received from target.");
                 }
 
-                return result.Result.Value;
+                var resultMessage = (ResultMessage)result;
+                return resultMessage.Result.Value;
             });
 
             var proxyInputs = new ParameterExpression[parameterCount];

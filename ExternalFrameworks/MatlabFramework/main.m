@@ -6,11 +6,9 @@ commonPath = fullfile(projectDir, 'ValidationBridge.Common', 'bin', 'Debug', 'ne
 NET.addAssembly(invokerPath);
 NET.addAssembly(commonPath);
 
-%%
-
 IVoltageSensorType = 'ValidationBridge.Common.Interfaces.Modules.IVoltageSensor';
 IVoltageSourceType = 'ValidationBridge.Common.Interfaces.Modules.IVoltageSource';
-
+%%
 loadedModules = ValidationBridge.Invoker.Modules.GetLoadedModules();
 disp(loadedModules.Item(0))
 
@@ -20,7 +18,13 @@ x = ValidationBridge.Invoker.Modules.GetModule("Keithley2000")
 
 %%
 
-ret = NET.invokeGenericMethod('ValidationBridge.Invoker.Modules', 'GetModuleWithType', {IVoltageSensorType}, 'Keithley2000');
+ret = NET.invokeGenericMethod('ValidationBridge.Invoker.Modules', 'GetModuleWithType', {IVoltageSensorType}, 'Keithley2000')
+
+%% NOT WORKING...
+ret = NET.invokeGenericMethod('ValidationBridge.Invoker.Modules', 'Cast', {IVoltageSensorType}, x)
+
+%%
+ret = NET.invokeGenericMethod('ValidationBridge.Invoker.Modules', 'GetTest', {IVoltageSensorType}, x.InstanceId.ToString)
 
 %%
 

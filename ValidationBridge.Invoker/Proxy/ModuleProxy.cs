@@ -11,7 +11,7 @@ using ValidationBridge.Common.Messages;
 
 namespace ValidationBridge.Invoker.Proxy
 {
-    public class ModuleProxy
+    public class ModuleProxy<TModule>
     {
         private Guid _instanceId;
         private TypeBuilder _typeBuilder;
@@ -27,18 +27,16 @@ namespace ValidationBridge.Invoker.Proxy
             _typeBuilder = GetTypeBuilder();
         }
 
-        public TModule GetModule<TModule>()
-        {
-            var module = GetModule(typeof(TModule));
-            return (TModule)module;
-        }
-
-        public dynamic GetModule(Type moduleType)
+        public TModule GetModule()
         {
             if (!Compiled)
             {
                 Compiled = true;
-                _compiledType = _typeBuilder.CreateType();
+
+                _compiledType = Type.GetType(_typeBuilder.AssemblyQualifiedName);
+
+                if (_compiledType == null)
+                    _compiledType = _typeBuilder.CreateType();
             }
 
             var moduleInstance = Activator.CreateInstance(_compiledType);
@@ -46,17 +44,17 @@ namespace ValidationBridge.Invoker.Proxy
             foreach (var member in _definedMembers.Values)
                 member?.Invoke(moduleInstance);
 
-            return moduleInstance;
+            return (TModule)moduleInstance;
         }
 
-        public void CreateProxy(Type proxyType, BridgeClient target)
+        public void CreateProxy(BridgeClient target)
         {
             if (Compiled)
                 throw new Exception("Cannot add methods to the compiled proxy, please create a new instance.");
 
-            _typeBuilder.AddInterfaceImplementation(proxyType);
+            _typeBuilder.AddInterfaceImplementation(typeof(TModule));
 
-            var moduleInfo = GetMemberInfo(proxyType);
+            var moduleInfo = GetMemberInfo(typeof(TModule));
 
             foreach (var moduleMember in moduleInfo)
             {
@@ -154,7 +152,7 @@ namespace ValidationBridge.Invoker.Proxy
 
         private TypeBuilder GetTypeBuilder()
         {
-            var typeSignature = $"{GetType().Namespace}.{_instanceId.ToString("N")}";
+            var typeSignature = $"{GetType().Namespace}.{typeof(TModule).Name}_{_instanceId.ToString("N")}";
             AssemblyBuilder assemblyBuilder = AppDomain.CurrentDomain.DefineDynamicAssembly(new AssemblyName(typeSignature), AssemblyBuilderAccess.Run);
             ModuleBuilder moduleBuilder = assemblyBuilder.DefineDynamicModule(Constants.DefaultAssemblyModuleName);
             TypeBuilder typeBuilder = moduleBuilder.DefineType(typeSignature, TypeAttributes.Public | TypeAttributes.Class);

@@ -40,14 +40,14 @@ namespace ValidationBridge.Invoker
         public static TModule Cast<TModule>(Guid instanceId)
         {
             var client = GetClient();
-            var proxy = new ModuleProxy(instanceId);
-            proxy.CreateProxy(typeof(TModule), client);
-            return proxy.GetModule(typeof(TModule));
+            var proxy = new ModuleProxy<TModule>(instanceId);
+            proxy.CreateProxy(client);
+            return proxy.GetModule();
         }
 
         public static IModule GetModule(string name)
         {
-            return (IModule) GetModuleWithType<IModule>(name);
+            return GetModuleWithType<IModule>(name);
         }
 
         public static TModule GetModuleWithType<TModule>(string name)

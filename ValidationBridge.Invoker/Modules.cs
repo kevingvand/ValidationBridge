@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using ValidationBridge.Common;
 using ValidationBridge.Common.Enumerations;
 using ValidationBridge.Common.Interfaces.Modules;
 using ValidationBridge.Common.Messages;
-using ValidationBridge.Invoker.Proxy;
+using ValidationBridge.Proxy;
 
 namespace ValidationBridge.Invoker
 {
@@ -20,6 +21,19 @@ namespace ValidationBridge.Invoker
                 _client = new BridgeClient();
             }
             return _client;
+        }
+
+        private static ICollection<Type> _commonModuleTypes;
+        private static ICollection<Type> GetCommonModuleTypes()
+        {
+            if(_commonModuleTypes == null)
+            {
+                var commonAssembly = Assembly.GetAssembly(typeof(IModule));
+                _commonModuleTypes = commonAssembly.GetTypes().Where(type => type.GetInterface(typeof(IModule).FullName) != null).ToList();
+                _commonModuleTypes.Add(typeof(IModule));
+            }
+
+            return _commonModuleTypes;
         }
 
         public static List<string> GetLoadedModules()
@@ -69,9 +83,11 @@ namespace ValidationBridge.Invoker
             if (!interfaceTypes.Contains(typeof(TModule).AssemblyQualifiedName))
                 return default(TModule); //TODO: better error handling
 
-            var proxy = new ModuleProxy<TModule>(instanceId);
-            proxy.CreateProxy(client);
-            return proxy.GetModule();
+            var proxy = new ProxyBuilder<TModule>();
+            proxy.AddProperty(nameof(IModule.InstanceId), typeof(Guid), true, false, instanceId);
+            proxy.CreateProxy(typeof(TModule), GetProxyBody(instanceId, client));
+
+            return proxy.GetInstance();
         }
 
         public static IModule GetModule(string name)
@@ -100,6 +116,42 @@ namespace ValidationBridge.Invoker
             }
 
             return Cast<TModule>(instanceId);
+        }
+
+        public static Type GetModuleType(string typeName)
+        {
+            var types = GetCommonModuleTypes();
+
+            var typeFromAssemblyQualifiedName = types.FirstOrDefault(type => type.AssemblyQualifiedName.Equals(typeName));
+            if (typeFromAssemblyQualifiedName != null) return typeFromAssemblyQualifiedName;
+
+            var typeFromFullName = types.FirstOrDefault(type => type.FullName.Equals(typeName));
+            if (typeFromFullName != null) return typeFromFullName;
+
+            var typeFromName = types.FirstOrDefault(type => type.Name.Equals(typeName));
+            if (typeFromName != null) return typeFromName;
+
+            return null;
+        }
+
+        private static ProxyFunction GetProxyBody(Guid instanceId, BridgeClient target)
+        {
+            return new ProxyFunction((functionName, proxyParameters) =>
+            {
+                var arguments = proxyParameters.Select(parameter => new Argument(ETypeExtension.FromSystemType(parameter.GetType()), parameter)).ToArray();
+                var invokeMessage = new InvokeMessage(instanceId, functionName, arguments);
+                var result = target.WriteMessage(invokeMessage);
+
+                if (result == null || result.MessageType != EMessageType.RESULT)
+                {
+                    return null;
+                    //TODO: error handling
+                    //throw new Exception("Invalid return message received from target.");
+                }
+
+                var resultMessage = (ResultMessage)result;
+                return resultMessage.Result.Value;
+            });
         }
     }
 }

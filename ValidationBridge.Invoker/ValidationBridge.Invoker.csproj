@@ -56,13 +56,15 @@
     <Compile Include="BridgeClient.cs" />
     <Compile Include="Modules.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Proxy\ModuleProxy.cs" />
-    <Compile Include="Proxy\ProxyFunction.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ValidationBridge.Common\ValidationBridge.Common.csproj">
       <Project>{5AA95FFA-4320-4459-9614-959F2747B4C9}</Project>
       <Name>ValidationBridge.Common</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ValidationBridge.Proxy\ValidationBridge.Proxy.csproj">
+      <Project>{b5678716-0048-4337-94b1-4ab53e0b1219}</Project>
+      <Name>ValidationBridge.Proxy</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

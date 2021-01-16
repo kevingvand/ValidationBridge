@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ValidationBridge.Invoker.Proxy
+namespace ValidationBridge.Proxy
 {
-    public delegate object ProxyFunction(params object[] parameters);
+    public delegate object ProxyFunction(string functionName, params object[] parameters);
 }

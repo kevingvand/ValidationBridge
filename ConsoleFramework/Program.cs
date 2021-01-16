@@ -25,6 +25,9 @@ namespace ConsoleFramework
 
         static void Main(string[] args)
         {
+
+            var type = Modules.GetModuleType("IVoltageSource");
+            var dfgdg = type.FullName;
             //var a = new
             //{
             //    Name = "Hello",
@@ -134,7 +137,7 @@ namespace ConsoleFramework
 
             var modules = Modules.GetLoadedModules();
 
-            var test = Modules.GetModuleWithType<IVoltageSource>("Keithley2000");
+            //var test = Modules.GetModuleWithType<IVoltageSource>("Keithley2000");
 
             var multimeter = Modules.GetModuleWithType<IVoltageSensor>("Keithley2400");
             //var aa = multimeter.ConnectGPIB(0, 9);
@@ -149,7 +152,7 @@ namespace ConsoleFramework
             multimeter.GetDCVoltage();
 
 
-            var otherMultimeter = Modules.GetModuleWithType<IVoltageSource>("Keithley2000");
+            var otherMultimeter = Modules.GetModuleWithType<IVoltageSource>("Keithley2400");
 
             otherMultimeter.SetDCVoltage(5);
 

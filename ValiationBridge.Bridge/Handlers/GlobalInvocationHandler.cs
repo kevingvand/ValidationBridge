@@ -69,7 +69,7 @@ namespace ValiationBridge.Bridge.Handlers
                 return GetErrorMessage($"Unable to load module, path specified but in wrong format (got {argument.Type}), expected {EType.STRING}).");
 
             string modulePath = argument.GetValue<string>();
-            if (!File.Exists(modulePath))
+            if (!File.Exists(modulePath) && !Directory.Exists(modulePath))
                 return GetErrorMessage($"Unable to load module, specified file does not exist ({modulePath}).");
 
             List<string> loadedModules = new List<string>();

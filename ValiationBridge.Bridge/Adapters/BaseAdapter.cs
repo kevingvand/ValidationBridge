@@ -16,7 +16,14 @@ namespace ValiationBridge.Bridge.Adapters
             LoadedModules = new Dictionary<string, Type>();
         }
 
-        public abstract IModule GetModule(string name);
+        public virtual IModule GetModule(string name)
+        {
+            if (!LoadedModules.ContainsKey(name))
+                return null;
+
+            var moduleType = LoadedModules[name];
+            return (IModule)Activator.CreateInstance(moduleType);
+        }
 
         public abstract List<string> LoadModule(string modulePath);
     }

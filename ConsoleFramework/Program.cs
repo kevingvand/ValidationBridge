@@ -26,8 +26,6 @@ namespace ConsoleFramework
         static void Main(string[] args)
         {
 
-            var type = Modules.GetModuleType("IVoltageSource");
-            var dfgdg = type.FullName;
             //var a = new
             //{
             //    Name = "Hello",
@@ -134,10 +132,19 @@ namespace ConsoleFramework
             //IVoltageSensor multimeterSensor = Modules.CastModule<IVoltageSensor>(multimeter);
 
             var loadedModules = Modules.LoadModule(@"C:\Users\Asus\Documents\Development\ValidationBridge\ValidationBridge\InstrumentModules\bin\Debug\InstrumentModules.dll");
+            var matlabModules = Modules.LoadModule(@"C:\Users\Asus\Documents\Development\ValidationBridge\ValidationBridge\ExternalModules\+Instruments");
 
             var modules = Modules.GetLoadedModules();
 
             //var test = Modules.GetModuleWithType<IVoltageSource>("Keithley2000");
+
+            var test = Modules.GetModuleWithType<IVoltageSensor>("KeysightB2901A2");
+
+            var x = test.GetDCVoltage();
+
+            var test2 = Modules.Cast<IVoltageSource>(test);
+            test2.SetDCVoltage(10);
+            var y = test.GetDCVoltage();
 
             var multimeter = Modules.GetModuleWithType<IVoltageSensor>("Keithley2400");
             //var aa = multimeter.ConnectGPIB(0, 9);

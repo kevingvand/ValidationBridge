@@ -35,7 +35,7 @@ namespace ValidationBridge.Invoker
                 return ErrorMessage.CreateFromBytes(returnBytes);
 
             if (messageType != EMessageType.RESULT)
-                throw new System.Exception("Expected only result messages."); //TODO: better error handlign? logging?
+                throw new System.Exception("Expected only result messages."); //TODO: better error ? logging?
 
             return ResultMessage.CreateFromBytes(returnBytes);
         }

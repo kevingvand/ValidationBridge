@@ -45,8 +45,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Adapters\BaseAdapter.cs" />
-    <Compile Include="Adapters\CSharpAdapter.cs" />
-    <Compile Include="Adapters\MatlabAdapter.cs" />
+    <Compile Include="Adapters\CSharp\AdapterCatalog.cs" />
+    <Compile Include="Adapters\CSharp\CSharpAdapter.cs" />
+    <Compile Include="Adapters\Matlab\Matlab.cs" />
+    <Compile Include="Adapters\Matlab\MatlabAdapter.cs" />
     <Compile Include="Bridge.cs" />
     <Compile Include="Handle.cs" />
     <Compile Include="Handlers\GlobalInvocationHandler.cs" />
@@ -65,6 +67,10 @@
     <ProjectReference Include="..\ValidationBridge.Common\ValidationBridge.Common.csproj">
       <Project>{5AA95FFA-4320-4459-9614-959F2747B4C9}</Project>
       <Name>ValidationBridge.Common</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ValidationBridge.Proxy\ValidationBridge.Proxy.csproj">
+      <Project>{B5678716-0048-4337-94B1-4AB53E0B1219}</Project>
+      <Name>ValidationBridge.Proxy</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup />

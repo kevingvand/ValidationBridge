@@ -1,11 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Reflection.Emit;
 using System.Reflection;
-using System.Linq.Expressions;
+using System.Reflection.Emit;
 
 namespace ValidationBridge.Proxy
 {
@@ -19,11 +16,17 @@ namespace ValidationBridge.Proxy
         private Type _compiledType;
         public bool Compiled { get; set; }
 
-        public ProxyBuilder(string typeSuffix = null)
+        public Guid InstanceId { get; set; }
+
+        public ProxyBuilder(Guid instanceId, string typeSuffix = null)
         {
+            InstanceId = instanceId;
+
             _definedMembers = new Dictionary<string, Action<object>>();
             _typeBuilder = GetTypeBuilder(typeSuffix);
             _implementedInterfaces = new List<Type>();
+
+            AddProperty("InstanceId", typeof(Guid), true, false, InstanceId);
         }
 
         public TInterface GetInstance()
@@ -45,6 +48,15 @@ namespace ValidationBridge.Proxy
                 Compile();
 
             return _compiledType;
+        }
+
+        public Action<object> GetInitializer()
+        {
+            return (instance) =>
+            {
+                foreach (var member in _definedMembers.Values)
+                    member?.Invoke(instance);
+            };
         }
 
         public void CreateProxy(Type type, ProxyFunction methodBody)
@@ -107,6 +119,7 @@ namespace ValidationBridge.Proxy
 
             methodGenerator.Emit(OpCodes.Ldarg_0);
             methodGenerator.Emit(OpCodes.Ldfld, methodField);
+            methodGenerator.Emit(OpCodes.Ldstr, InstanceId.ToString());
             methodGenerator.Emit(OpCodes.Ldstr, method.Name);
 
             // Array Creation
@@ -145,7 +158,7 @@ namespace ValidationBridge.Proxy
             FieldBuilder propertyFieldBuilder = _typeBuilder.DefineField(propertyFieldName, propertyType, FieldAttributes.Private);
             PropertyBuilder propertyBuilder = _typeBuilder.DefineProperty(name, PropertyAttributes.HasDefault, propertyType, Type.EmptyTypes);
 
-            if(allowGet)
+            if (allowGet)
             {
                 MethodBuilder propertyGetMethodBuilder = _typeBuilder.DefineMethod($"get_{name}", MethodAttributes.Public | MethodAttributes.Virtual | MethodAttributes.SpecialName | MethodAttributes.HideBySig, propertyType, Type.EmptyTypes);
                 ILGenerator propertyGetMethodGenerator = propertyGetMethodBuilder.GetILGenerator();

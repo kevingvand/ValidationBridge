@@ -23,19 +23,6 @@ namespace ValidationBridge.Invoker
             return _client;
         }
 
-        private static ICollection<Type> _commonModuleTypes;
-        private static ICollection<Type> GetCommonModuleTypes()
-        {
-            if(_commonModuleTypes == null)
-            {
-                var commonAssembly = Assembly.GetAssembly(typeof(IModule));
-                _commonModuleTypes = commonAssembly.GetTypes().Where(type => type.GetInterface(typeof(IModule).FullName) != null).ToList();
-                _commonModuleTypes.Add(typeof(IModule));
-            }
-
-            return _commonModuleTypes;
-        }
-
         public static List<string> GetLoadedModules()
         {
             var client = GetClient();
@@ -83,8 +70,7 @@ namespace ValidationBridge.Invoker
             if (!interfaceTypes.Contains(typeof(TModule).AssemblyQualifiedName))
                 return default(TModule); //TODO: better error handling
 
-            var proxy = new ProxyBuilder<TModule>(instanceId.ToString("N"));
-            proxy.AddProperty(nameof(IModule.InstanceId), typeof(Guid), true, false, instanceId);
+            var proxy = new ProxyBuilder<TModule>(instanceId, instanceId.ToString("N"));
             proxy.CreateProxy(typeof(TModule), GetProxyBody(instanceId, client));
 
             return proxy.GetInstance();
@@ -118,25 +104,9 @@ namespace ValidationBridge.Invoker
             return Cast<TModule>(instanceId);
         }
 
-        public static Type GetModuleType(string typeName)
-        {
-            var types = GetCommonModuleTypes();
-
-            var typeFromAssemblyQualifiedName = types.FirstOrDefault(type => type.AssemblyQualifiedName.Equals(typeName));
-            if (typeFromAssemblyQualifiedName != null) return typeFromAssemblyQualifiedName;
-
-            var typeFromFullName = types.FirstOrDefault(type => type.FullName.Equals(typeName));
-            if (typeFromFullName != null) return typeFromFullName;
-
-            var typeFromName = types.FirstOrDefault(type => type.Name.Equals(typeName));
-            if (typeFromName != null) return typeFromName;
-
-            return null;
-        }
-
         private static ProxyFunction GetProxyBody(Guid instanceId, BridgeClient target)
         {
-            return new ProxyFunction((functionName, proxyParameters) =>
+            return new ProxyFunction((_, functionName, proxyParameters) =>
             {
                 var arguments = proxyParameters.Select(parameter => new Argument(ETypeExtension.FromSystemType(parameter.GetType()), parameter)).ToArray();
                 var invokeMessage = new InvokeMessage(instanceId, functionName, arguments);

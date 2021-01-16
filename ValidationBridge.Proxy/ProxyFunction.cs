@@ -6,5 +6,5 @@ using System.Threading.Tasks;
 
 namespace ValidationBridge.Proxy
 {
-    public delegate object ProxyFunction(string functionName, params object[] parameters);
+    public delegate object ProxyFunction(string instanceId, string functionName, params object[] parameters);
 }

@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using ValiationBridge.Bridge.Adapters;
+using ValiationBridge.Bridge.Adapters.CSharp;
+using ValiationBridge.Bridge.Adapters.Matlab;
 using ValiationBridge.Bridge.Handlers;
 using ValiationBridge.Bridge.Services;
 using ValidationBridge.Common.Messages;
@@ -27,9 +29,11 @@ namespace ValiationBridge.Bridge
         public Bridge()
         {
             InstanceManager = new InstanceManager();
+            //TODO: load dynamically?
             ModuleAdapters = new List<BaseAdapter>
             {
-                new CSharpAdapter()
+                new CSharpAdapter(),
+                new MatlabAdapter()
             };
 
             _logService = new LogService();

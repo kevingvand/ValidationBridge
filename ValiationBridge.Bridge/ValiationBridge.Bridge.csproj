@@ -46,6 +46,7 @@
   <ItemGroup>
     <Compile Include="Adapters\BaseAdapter.cs" />
     <Compile Include="Adapters\CSharpAdapter.cs" />
+    <Compile Include="Adapters\MatlabAdapter.cs" />
     <Compile Include="Bridge.cs" />
     <Compile Include="Handle.cs" />
     <Compile Include="Handlers\GlobalInvocationHandler.cs" />

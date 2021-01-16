@@ -19,10 +19,10 @@ namespace ValidationBridge.Proxy
         private Type _compiledType;
         public bool Compiled { get; set; }
 
-        public ProxyBuilder()
+        public ProxyBuilder(string typeSuffix = null)
         {
             _definedMembers = new Dictionary<string, Action<object>>();
-            _typeBuilder = GetTypeBuilder();
+            _typeBuilder = GetTypeBuilder(typeSuffix);
             _implementedInterfaces = new List<Type>();
         }
 
@@ -191,9 +191,9 @@ namespace ValidationBridge.Proxy
             return $"_{char.ToLowerInvariant(name[0])}{name.Substring(1)}";
         }
 
-        private TypeBuilder GetTypeBuilder()
+        private TypeBuilder GetTypeBuilder(string typeSuffix = null)
         {
-            var typeSignature = $"{GetType().Namespace}.{typeof(TInterface).Name}";
+            var typeSignature = $"{GetType().Namespace}.{typeof(TInterface).Name}{(typeSuffix != null ? $"_{typeSuffix}" : string.Empty)}";
             AssemblyBuilder assemblyBuilder = AppDomain.CurrentDomain.DefineDynamicAssembly(new AssemblyName(typeSignature), AssemblyBuilderAccess.Run);
             ModuleBuilder moduleBuilder = assemblyBuilder.DefineDynamicModule(DefaultAssemblyModuleName);
             TypeBuilder typeBuilder = moduleBuilder.DefineType(typeSignature, TypeAttributes.Public | TypeAttributes.Class);

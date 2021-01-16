@@ -83,7 +83,7 @@ namespace ValidationBridge.Invoker
             if (!interfaceTypes.Contains(typeof(TModule).AssemblyQualifiedName))
                 return default(TModule); //TODO: better error handling
 
-            var proxy = new ProxyBuilder<TModule>();
+            var proxy = new ProxyBuilder<TModule>(instanceId.ToString("N"));
             proxy.AddProperty(nameof(IModule.InstanceId), typeof(Guid), true, false, instanceId);
             proxy.CreateProxy(typeof(TModule), GetProxyBody(instanceId, client));
 

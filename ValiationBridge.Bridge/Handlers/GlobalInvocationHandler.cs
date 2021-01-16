@@ -90,8 +90,8 @@ namespace ValiationBridge.Bridge.Handlers
         private ResultMessage GetModules()
         {
             var loadedModules = _adapters
-                .SelectMany(adapter => adapter.LoadedModules)
-                .Select(adapter => adapter.GetName()).ToArray();
+                .SelectMany(adapter => adapter.LoadedModules.Keys)
+                .ToArray();
 
             return new ResultMessage(new Argument(loadedModules));
         }
@@ -128,7 +128,7 @@ namespace ValiationBridge.Bridge.Handlers
 
         private PipeMessage GetModuleInstanceByName(string name, Type type)
         {
-            BaseAdapter moduleAdapter = _adapters.FirstOrDefault(adapter => adapter.LoadedModules.Any(loadedModule => loadedModule.GetName().Equals(name)));
+            BaseAdapter moduleAdapter = _adapters.FirstOrDefault(adapter => adapter.LoadedModules.ContainsKey(name));
 
             if (moduleAdapter == null)
                 return GetErrorMessage($@"Unable to retrieve module, module with name: ""{name}"" not found.");

@@ -9,11 +9,11 @@ namespace ValiationBridge.Bridge.Adapters
 {
     public abstract class BaseAdapter
     {
-        public List<IModule> LoadedModules { get; set; }
+        public Dictionary<string, Type> LoadedModules { get; set; }
 
         public BaseAdapter()
         {
-            LoadedModules = new List<IModule>();
+            LoadedModules = new Dictionary<string, Type>();
         }
 
         public abstract IModule GetModule(string name);

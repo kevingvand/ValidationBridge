@@ -57,5 +57,19 @@ namespace ValidationBridge.Common.Services
                    .Concat(type.GetInterfaces())
                    .SelectMany(i => i.GetMethods());
         }
+
+        public static MethodInfo GetPublicMethod(Type type, string methodName)
+        {
+            var methodInfo = type.GetMethod(methodName);
+            if (methodInfo != null) return methodInfo;
+
+            foreach(var implementedInterface in type.GetInterfaces())
+            {
+                methodInfo = implementedInterface.GetMethod(methodName);
+                if (methodInfo != null) return methodInfo;
+            }
+
+            return null;
+        }
     }
 }

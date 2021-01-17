@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using ValidationBridge.Common;
 using ValidationBridge.Common.Enumerations;
 using ValidationBridge.Common.Interfaces.Modules;
@@ -70,8 +69,14 @@ namespace ValidationBridge.Invoker
             if (!interfaceTypes.Contains(typeof(TModule).AssemblyQualifiedName))
                 return default(TModule); //TODO: better error handling
 
-            var proxy = new ProxyBuilder<TModule>(instanceId, instanceId.ToString("N"));
+            var proxy = new ProxyBuilder<TModule>(instanceId, $"{typeof(Modules).Namespace}.Proxy", instanceId.ToString("N"));
             proxy.CreateProxy(typeof(TModule), GetProxyBody(instanceId, client));
+
+            if (typeof(TModule) is IInstrument)
+            {
+                dynamic instance = proxy.GetInstance();
+                var a = instance.Connect("GPIB");
+            }
 
             return proxy.GetInstance();
         }

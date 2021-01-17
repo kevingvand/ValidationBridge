@@ -52,12 +52,16 @@ namespace ValiationBridge.Bridge.Adapters.Matlab
             var packageName = directoryInfo.Name.Substring(1);
 
             var validModules = GetValidModules(packagePath, packageName);
-            //TODO: build module types.
 
             foreach (var moduleInfo in validModules)
             {
                 var moduleProxyType = CreateModuleProxy(moduleInfo);
-                LoadedModules.Add(moduleInfo.ModuleName, moduleProxyType);
+                if (LoadedModules.ContainsKey(moduleInfo.ModuleName))
+                {
+                    _logService.LogWarning($@"Matlab module with name: ""{moduleInfo.ModuleName}"" already exists, replacing.");
+                    LoadedModules[moduleInfo.ModuleName] = moduleProxyType;
+                }
+                else LoadedModules.Add(moduleInfo.ModuleName, moduleProxyType);
             }
 
             return validModules.Select(x => x.ModuleName).ToList();
@@ -65,7 +69,7 @@ namespace ValiationBridge.Bridge.Adapters.Matlab
 
         private Type CreateModuleProxy(ProxyModuleInformation moduleInfo)
         {
-            var proxy = new ProxyBuilder<IModule>(Guid.NewGuid(), moduleInfo.ModuleName);
+            var proxy = new ProxyBuilder<IModule>(Guid.NewGuid(), $"{typeof(BaseAdapter).Namespace}.Proxy", moduleInfo.ModuleName);
 
             foreach (var moduleInterface in moduleInfo.Interfaces)
             {
@@ -91,7 +95,7 @@ namespace ValiationBridge.Bridge.Adapters.Matlab
 
                     var argumentString = string.Join(", ", arguments.Select(argument => GetArgumentAsString(argument)));
 
-                    int outputLength = (int) matlab.EvaluateExpression("outputLength", "size(moduleMetaMethodInfo.OutputNames, 1)");
+                    int outputLength = (int)matlab.EvaluateExpression("outputLength", "size(moduleMetaMethodInfo.OutputNames, 1)");
 
                     if (outputLength > 0)
                     {
@@ -108,7 +112,7 @@ namespace ValiationBridge.Bridge.Adapters.Matlab
 
                         //TODO: allow for multiple result values?
                         matlab.Execute($@"methodInvocationResult = instances.{instanceVariable}.{methodName}{(arguments.Length > 0 ? $"({argumentString})" : string.Empty)}");
-                        var returnType = moduleInterface.GetMethod(methodName).ReturnType;
+                        var returnType = ModuleService.GetPublicMethod(moduleInterface, methodName).ReturnType;
                         return matlab.GetVariable("methodInvocationResult", returnType);
                     }
 

@@ -1,16 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.Composition;
-using System.ComponentModel.Composition.Hosting;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Reflection;
-using ValidationBridge.Common.Interfaces.Modules;
+using ValiationBridge.Bridge.Services;
 
 namespace ValiationBridge.Bridge.Adapters.CSharp
 {
     public class CSharpAdapter : BaseAdapter
     {
+        private LogService _logService;
+
+        public CSharpAdapter()
+        {
+            _logService = new LogService();
+        }
+
         public override List<string> LoadModule(string modulePath)
         {
             var fileExtension = Path.GetExtension(modulePath);
@@ -19,11 +22,16 @@ namespace ValiationBridge.Bridge.Adapters.CSharp
             var catalog = new AdapterCatalog();
             catalog.ComposeFromAssembly(modulePath);
 
-            var loadedModules = catalog.Modules.ToDictionary(module => module.GetName(), module => module.GetType());
-
-            //TODO: what to do if 2 modules with the same name are loaded.
-
-            LoadedModules = LoadedModules.Concat(loadedModules).ToDictionary(loadedModule => loadedModule.Key, loadedModule => loadedModule.Value);
+            foreach (var loadedModule in catalog.Modules)
+            {
+                var moduleName = loadedModule.GetName();
+                if (LoadedModules.ContainsKey(loadedModule.GetName()))
+                {
+                    _logService.LogWarning($@"C# module with name: ""{moduleName}"" already exists, replacing.");
+                    LoadedModules[moduleName] = loadedModule.GetType();
+                }
+                else LoadedModules.Add(moduleName, loadedModule.GetType());
+            }
 
             return catalog.Modules.Select(module => module.GetName()).ToList();
         }

@@ -138,38 +138,46 @@ namespace ConsoleFramework
 
             //var test = Modules.GetModuleWithType<IVoltageSource>("Keithley2000");
 
-            var test = Modules.GetModuleWithType<IVoltageSensor>("KeysightB2901A2");
+            var module = Modules.GetModule("KeysightB2901A2");
+            var source = Modules.Cast<IVoltageSource>(module);
+            var sensor = Modules.Cast<IVoltageSensor>(module);
 
-            var x = test.GetDCVoltage();
+            var val1 = sensor.GetDCVoltage();
+            source.SetDCVoltage(14);
+            var val2 = sensor.GetDCVoltage();
 
-            var test2 = Modules.Cast<IVoltageSource>(test);
-            test2.SetDCVoltage(10);
-            var y = test.GetDCVoltage();
+            //var test = Modules.GetModuleWithType<IVoltageSensor>("KeysightB2901A2");
 
-            var multimeter = Modules.GetModuleWithType<IVoltageSensor>("Keithley2400");
-            //var aa = multimeter.ConnectGPIB(0, 9);
-            var aa = multimeter.Connect("ssPIB");
+            //var x = test.GetDCVoltage();
 
-            var ab = multimeter.GetDCVoltage();
+            //var test2 = Modules.Cast<IVoltageSource>(test);
+            //test2.SetDCVoltage(10);
+            //var y = test.GetDCVoltage();
 
-            var source = Modules.Cast<IVoltageSource>(multimeter);
+            //var multimeter = Modules.GetModuleWithType<IVoltageSensor>("Keithley2400");
+            ////var aa = multimeter.ConnectGPIB(0, 9);
+            //var aa = multimeter.Connect("ssPIB");
 
-            source.SetDCVoltage(123.5);
+            //var ab = multimeter.GetDCVoltage();
 
-            multimeter.GetDCVoltage();
+            //var source = Modules.Cast<IVoltageSource>(multimeter);
 
+            //source.SetDCVoltage(123.5);
 
-            var otherMultimeter = Modules.GetModuleWithType<IVoltageSource>("Keithley2400");
-
-            otherMultimeter.SetDCVoltage(5);
-
-            for (int i = 0; i < 10; i++)
-                Console.WriteLine(multimeter.GetDCVoltage());
+            //multimeter.GetDCVoltage();
 
 
-            Console.WriteLine(multimeter.GetDCVoltage());
+            //var otherMultimeter = Modules.GetModuleWithType<IVoltageSource>("Keithley2400");
 
-            Console.WriteLine(multimeter.GetDescription());
+            //otherMultimeter.SetDCVoltage(5);
+
+            //for (int i = 0; i < 10; i++)
+            //    Console.WriteLine(multimeter.GetDCVoltage());
+
+
+            //Console.WriteLine(multimeter.GetDCVoltage());
+
+            //Console.WriteLine(multimeter.GetDescription());
 
             Console.ReadKey();
         }

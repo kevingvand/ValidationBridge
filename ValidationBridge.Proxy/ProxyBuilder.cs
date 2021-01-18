@@ -108,8 +108,9 @@ namespace ValidationBridge.Proxy
         {
             if (_definedMembers.ContainsKey(method.Name)) return; //TODO: error handling if 2 methods with same name
 
-            var parameterTypes = method.GetParameters().Select(parameter => parameter.ParameterType).ToArray();
-            var parameterCount = parameterTypes.Length;
+            var parameters = method.GetParameters();
+            var parameterTypes = parameters.Select(parameter => parameter.ParameterType).ToArray();
+            var parameterCount = parameters.Length;
 
             var methodFieldName = GetFieldName(method.Name);
             var methodField = _typeBuilder.DefineField(methodFieldName, typeof(ProxyFunction), FieldAttributes.Private);
@@ -133,6 +134,8 @@ namespace ValidationBridge.Proxy
                 methodGenerator.Emit(OpCodes.Ldarg, i);
                 methodGenerator.Emit(OpCodes.Box, parameterTypes[i - 1]);
                 methodGenerator.Emit(OpCodes.Stelem_Ref);
+
+                methodBuilder.DefineParameter(i, ParameterAttributes.None, parameters[i - 1].Name);
             }
 
             methodGenerator.Emit(OpCodes.Call, typeof(ProxyFunction).GetMethod("Invoke"));
@@ -209,7 +212,7 @@ namespace ValidationBridge.Proxy
             var typeSignature = $"{(baseNamespace == null ? GetType().Namespace : baseNamespace)}.{typeof(TInterface).Name}{(typeSuffix != null ? $"_{typeSuffix}" : string.Empty)}";
             AssemblyBuilder assemblyBuilder = AppDomain.CurrentDomain.DefineDynamicAssembly(new AssemblyName(typeSignature), AssemblyBuilderAccess.Run);
             ModuleBuilder moduleBuilder = assemblyBuilder.DefineDynamicModule(DefaultAssemblyModuleName);
-            TypeBuilder typeBuilder = moduleBuilder.DefineType(typeSignature, TypeAttributes.Public | TypeAttributes.Class);
+            TypeBuilder typeBuilder = moduleBuilder.DefineType(typeSignature, TypeAttributes.Public | TypeAttributes.Class | TypeAttributes.AutoLayout);
 
             return typeBuilder;
         }

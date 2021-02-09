@@ -18,6 +18,8 @@ namespace ValiationBridge.Bridge.Adapters.Matlab
 
         public MatlabAdapter()
         {
+            _logService = new LogService();
+
             _initializerMap = new Dictionary<Type, Action<object>>();
         }
 
@@ -35,8 +37,6 @@ namespace ValiationBridge.Bridge.Adapters.Matlab
 
         public override List<string> LoadModule(string modulePath)
         {
-            _logService = new LogService();
-
             if (!Matlab.IsInstalled())
             {
                 _logService.LogWarning($"MATLAB is not installed, no MATLAB modules can be loaded.");

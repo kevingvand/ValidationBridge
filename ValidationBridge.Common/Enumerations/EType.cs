@@ -54,5 +54,25 @@ namespace ValidationBridge.Common.Enumerations
 
             throw new Exception("Specified type is invalid.");
         }
+
+        public static dynamic GetValue(this EType type, byte[] value)
+        {
+            switch (type)
+            {
+                case EType.INT:
+                    return BitConverter.ToInt32(value, 0);
+                case EType.BOOL:
+                    return BitConverter.ToBoolean(value, 0);
+                case EType.DOUBLE:
+                    return BitConverter.ToDouble(value, 0);
+                case EType.CHAR:
+                    return BitConverter.ToChar(value, 0);
+                case EType.STRING:
+                    return Constants.ServerEncoding.GetString(value);
+                case EType.NONE:
+                default:
+                    return null;
+            }
+        }
     }
 }

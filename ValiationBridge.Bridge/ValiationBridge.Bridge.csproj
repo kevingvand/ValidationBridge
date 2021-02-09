@@ -49,6 +49,14 @@
     <Compile Include="Adapters\CSharp\CSharpAdapter.cs" />
     <Compile Include="Adapters\Matlab\Matlab.cs" />
     <Compile Include="Adapters\Matlab\MatlabAdapter.cs" />
+    <Compile Include="Adapters\Python\Enumerations\EPythonMessageType.cs" />
+    <Compile Include="Adapters\Python\Messages\BasePythonMessage.cs" />
+    <Compile Include="Adapters\Python\Messages\PythonResultMessage.cs" />
+    <Compile Include="Adapters\Python\Messages\PythonTextMessage.cs" />
+    <Compile Include="Adapters\Python\PythonAdapter.cs" />
+    <Compile Include="Adapters\Python\PythonBuilder.cs" />
+    <Compile Include="Adapters\Python\PythonConsole.cs" />
+    <Compile Include="Adapters\Python\PythonException.cs" />
     <Compile Include="Bridge.cs" />
     <Compile Include="Handle.cs" />
     <Compile Include="Handlers\GlobalInvocationHandler.cs" />

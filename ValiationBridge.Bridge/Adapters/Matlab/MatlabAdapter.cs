@@ -172,7 +172,7 @@ namespace ValiationBridge.Bridge.Adapters.Matlab
                 // Get number of implemented interfaces
                 var interfaceCount = matlab.EvaluateExpression("moduleInterfaceCount", "size(moduleInstance.Implements, 2)", true);
 
-                // Assume module is valid, until proven otherwise.
+                // Assume module is valid, until proven otherwise
                 var validModule = true;
 
                 // Loop through all interfaces

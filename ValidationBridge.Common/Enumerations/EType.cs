@@ -50,7 +50,11 @@ namespace ValidationBridge.Common.Enumerations
             else if (type == typeof(string)) return EType.STRING;
             else if (type == typeof(Guid)) return EType.HANDLE;
             else if (type == typeof(void)) return EType.NONE;
-            else if (type.IsArray || type == typeof(Array)) return EType.ARRAY;
+            else if (type.IsArray || type == typeof(Array))
+            {
+                var elementType = FromSystemType(type.GetElementType());
+                return EType.ARRAY | elementType;
+            }
 
             throw new Exception("Specified type is invalid.");
         }

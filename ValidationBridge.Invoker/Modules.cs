@@ -18,6 +18,7 @@ namespace ValidationBridge.Invoker
             if (_client == null)
             {
                 _client = new BridgeClient();
+                _client.Connect();
             }
             return _client;
         }

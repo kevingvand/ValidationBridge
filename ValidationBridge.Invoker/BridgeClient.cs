@@ -1,4 +1,7 @@
-﻿using System.IO.Pipes;
+﻿using System.Diagnostics;
+using System.IO;
+using System.IO.Pipes;
+using System.Linq;
 using ValidationBridge.Common;
 using ValidationBridge.Common.Enumerations;
 using ValidationBridge.Common.Messages;
@@ -14,6 +17,15 @@ namespace ValidationBridge.Invoker
         {
             ClientStream = new NamedPipeClientStream(".", Constants.ServerName, PipeDirection.InOut, PipeOptions.None, System.Security.Principal.TokenImpersonationLevel.Impersonation);
             Stream = new Common.PipeStream(ClientStream);
+
+        }
+
+        public void Connect()
+        {
+            var isServerRunning = Directory.GetFiles(@"\\.\pipe\").Contains($@"\\.\pipe\{Constants.ServerName}");
+
+            if (!isServerRunning)
+                Process.Start(new ProcessStartInfo { FileName = Constants.BridgePath, WindowStyle = Constants.ShowBridgeWindow ? ProcessWindowStyle.Normal : ProcessWindowStyle.Hidden });
 
             ClientStream.Connect();
         }

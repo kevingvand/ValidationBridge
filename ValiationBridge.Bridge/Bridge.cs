@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using ValiationBridge.Bridge.Adapters;
 using ValiationBridge.Bridge.Adapters.CSharp;
 using ValiationBridge.Bridge.Adapters.Matlab;
+using ValiationBridge.Bridge.Adapters.Python;
 using ValiationBridge.Bridge.Handlers;
 using ValiationBridge.Bridge.Services;
 using ValidationBridge.Common.Messages;
@@ -33,7 +34,8 @@ namespace ValiationBridge.Bridge
             ModuleAdapters = new List<BaseAdapter>
             {
                 new CSharpAdapter(),
-                new MatlabAdapter()
+                new MatlabAdapter(),
+                new PythonAdapter()
             };
 
             _logService = new LogService();

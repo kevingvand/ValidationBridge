@@ -20,7 +20,6 @@ namespace ValiationBridge.Bridge
             //TODO: multiple bridge instances 
             var bridge = new Bridge();
             bridge.Start();
-
         }
     }
 }

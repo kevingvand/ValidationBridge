@@ -131,16 +131,25 @@ namespace ConsoleFramework
             //IVoltageSource multimeterSource = Modules.CastModule<IVoltageSource>(multimeter);
             //IVoltageSensor multimeterSensor = Modules.CastModule<IVoltageSensor>(multimeter);
 
-            var loadedModules = Modules.LoadModule(@"C:\Users\Asus\Documents\Development\ValidationBridge\ValidationBridge\InstrumentModules\bin\Debug\InstrumentModules.dll");
-            var matlabModules = Modules.LoadModule(@"C:\Users\Asus\Documents\Development\ValidationBridge\ValidationBridge\ExternalModules\+Instruments");
+            //var loadedModules = Modules.LoadModule(@"C:\Users\Asus\Documents\Development\ValidationBridge\ValidationBridge\InstrumentModules\bin\Debug\InstrumentModules.dll");
+            //var matlabModules = Modules.LoadModule(@"C:\Users\Asus\Documents\Development\ValidationBridge\ValidationBridge\ExternalModules\+Instruments");
+            var pythonModules = Modules.LoadModule(@"C:\Users\Asus\PycharmProjects\ValidationBridgeFramework\Modules");
 
             var modules = Modules.GetLoadedModules();
 
+            var module = Modules.GetModule("Keithley2001");
+
+            var plotter = Modules.Cast<IPlotter>(module);
+
+            var z = plotter.GetPoints(5);
+
             //var test = Modules.GetModuleWithType<IVoltageSource>("Keithley2000");
 
-            var module = Modules.GetModule("KeysightB2901A2");
+            //var module = Modules.GetModule("KeysightB2901A2");
             var source = Modules.Cast<IVoltageSource>(module);
             var sensor = Modules.Cast<IVoltageSensor>(module);
+
+            var x = source.GetDescription();
 
             var val1 = sensor.GetDCVoltage();
             source.SetDCVoltage(14);

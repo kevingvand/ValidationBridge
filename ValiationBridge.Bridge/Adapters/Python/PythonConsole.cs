@@ -95,6 +95,29 @@ namespace ValiationBridge.Bridge.Adapters.Python
             return resultMessage.GetValue();
         }
 
+        public void Import(params string[] modules)
+        {
+            Execute($"import {string.Join(", ", modules)}");
+        }
+
+        public void AddPath(string path)
+        {
+            Import("sys");
+            Execute($"sys.path.append('{GetFormattedPath(path)}')");
+        }
+
+        public void DefineVariable(string variableName, dynamic expression)
+        {
+            Execute($"{variableName} = {expression}");
+        }
+
+        public void DefineStringVariable(string variableName, string value) => DefineVariable(variableName, $@"'{value}'");
+
+        public string GetFormattedPath(string path)
+        {
+            return new PythonBuilder().GetFormattedPath(path);
+        }
+
         private string RunPythonCommand(string command)
         {
             ProcessStartInfo start = new ProcessStartInfo
@@ -206,7 +229,7 @@ namespace ValiationBridge.Bridge.Adapters.Python
             builder.AddLine("if isinstance(value, list):", 1);
             builder.DefineVariable("value_bytes, result_type", "read_array(value)", 2);
             builder.AddLine("elif isinstance(value, float):", 1);
-            builder.DefineVariable("value_bytes", "struct.pack('f', value)", 2);
+            builder.DefineVariable("value_bytes", "struct.pack('d', value)", 2);
             builder.DefineVariable("result_type", "4", 2);
             builder.AddLine("elif type(value) is bool:", 1);
             builder.DefineVariable("value_bytes", "struct.pack('?', value)", 2);

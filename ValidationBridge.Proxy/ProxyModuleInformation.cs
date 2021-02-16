@@ -10,6 +10,7 @@ namespace ValidationBridge.Proxy
     {
         public string ClassName { get; set; }
         public string ModuleName { get; set; }
+        public string PackagePath { get; set; }
         public List<Type> Interfaces { get; set; }
 
         public ProxyModuleInformation(string className)
@@ -17,6 +18,13 @@ namespace ValidationBridge.Proxy
             ClassName = className;
             Interfaces = new List<Type>();
         }
+
+        public ProxyModuleInformation(string className, string packagePath)
+            :this(className)
+        {
+            PackagePath = packagePath;
+        }
+
 
         public ProxyModuleInformation(string className, string moduleName, List<Type> interfaces)
             : this(className)

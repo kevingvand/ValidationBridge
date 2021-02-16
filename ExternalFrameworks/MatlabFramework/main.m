@@ -8,13 +8,16 @@ NET.addAssembly(commonPath);
 
 IVoltageSensorType = 'ValidationBridge.Common.Interfaces.Modules.IVoltageSensor';
 IVoltageSourceType = 'ValidationBridge.Common.Interfaces.Modules.IVoltageSource';
+IPlotter = 'ValidationBridge.Common.Interfaces.Modules.IPlotter';
+%%
+ValidationBridge.Invoker.Modules.LoadModule("C:\Users\Asus\PycharmProjects\ValidationBridgeFramework\Modules")
 %%
 loadedModules = ValidationBridge.Invoker.Modules.GetLoadedModules();
 disp(loadedModules.Item(0))
 
 %%
 
-x = ValidationBridge.Invoker.Modules.GetModule("Keithley2000")
+x = ValidationBridge.Invoker.Modules.GetModule("Keithley2001")
 
 %%
 
@@ -25,6 +28,9 @@ ret = NET.invokeGenericMethod('ValidationBridge.Invoker.Modules', 'Cast', {IVolt
 
 %%
 ret = NET.invokeGenericMethod('ValidationBridge.Invoker.Modules', 'GetTest', {IVoltageSensorType}, x.InstanceId.ToString)
+
+%%
+ret = NET.invokeGenericMethod('ValidationBridge.Invoker.Modules', 'Cast', {IPlotter}, x)
 
 %%
 

@@ -57,6 +57,7 @@
     <Compile Include="Adapters\Python\PythonBuilder.cs" />
     <Compile Include="Adapters\Python\PythonConsole.cs" />
     <Compile Include="Adapters\Python\PythonException.cs" />
+    <Compile Include="Adapters\Python\PythonInstanceManager.cs" />
     <Compile Include="Bridge.cs" />
     <Compile Include="Handle.cs" />
     <Compile Include="Handlers\GlobalInvocationHandler.cs" />

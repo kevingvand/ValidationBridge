@@ -79,11 +79,12 @@ namespace ValidationBridge.Common.Messages
 
                 var values = valueArrays.SelectMany(valueArray => valueArray).ToArray();
 
-                var result = new byte[values.Length + 3];
+                var result = new byte[values.Length + 5];
                 result[0] = Convert.ToByte(Type);
-                result[1] = (byte)(array.Length / 256);
-                result[2] = (byte)(array.Length & 255);
-                values.CopyTo(result, 3);
+
+                var lengthBytes = BitConverter.GetBytes(array.Length);
+                lengthBytes.CopyTo(result, 1);
+                values.CopyTo(result, 5);
 
                 return result;
             }
@@ -151,12 +152,13 @@ namespace ValidationBridge.Common.Messages
 
             if (type.HasFlag(EType.ARRAY))
             {
-                var elementCount = bytes[1] * 256 + bytes[2];
+                //var elementCount = bytes[1] * 256 + bytes[2];
+                var elementCount = BitConverter.ToInt32(bytes.Skip(1).Take(4).ToArray(), 0);
                 var elementType = type & ~EType.ARRAY;
 
                 var result = Array.CreateInstance(elementType.GetSystemType(), elementCount);
 
-                var currentIndex = 3;
+                var currentIndex = 5;
                 for (var i = 0; i < elementCount; i++)
                 {
                     var elementLength = bytes[currentIndex] * 256 + bytes[currentIndex + 1];

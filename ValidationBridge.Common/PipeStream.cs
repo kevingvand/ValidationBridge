@@ -16,8 +16,9 @@ namespace ValidationBridge.Common
 
         public byte[] Read()
         {
-            var a = _stream.CanRead;
-            int length = _stream.ReadByte() * 256 + _stream.ReadByte();
+            byte[] lengthBytes = new byte[4];
+            _stream.Read(lengthBytes, 0, 4);
+            int length = BitConverter.ToInt32(lengthBytes, 0);
             if (length < 0) return null;
 
             byte[] inBuffer = new byte[length];
@@ -32,8 +33,7 @@ namespace ValidationBridge.Common
             if (length > ushort.MaxValue)
                 length = ushort.MaxValue;
 
-            _stream.WriteByte((byte)(length / 256));
-            _stream.WriteByte((byte)(length & 255));
+            _stream.Write(BitConverter.GetBytes(length), 0, 4);
             _stream.Write(buffer, 0, length);
             _stream.Flush();
 

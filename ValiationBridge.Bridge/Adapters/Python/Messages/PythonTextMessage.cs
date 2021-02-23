@@ -22,11 +22,12 @@ namespace ValiationBridge.Bridge.Adapters.Python.Messages
         {
             var text = Constants.ServerEncoding.GetBytes(Text);
 
-            byte[] result = new byte[text.Length + 3];
+            byte[] result = new byte[text.Length + 5];
             result[0] = (byte)MessageType;
-            result[1] = (byte)(text.Length / 256);
-            result[2] = (byte)(text.Length & 255);
-            text.CopyTo(result, 3);
+
+            var lengthBytes = BitConverter.GetBytes(text.Length);
+            lengthBytes.CopyTo(result, 1);
+            text.CopyTo(result, 5);
 
             return result;
         }

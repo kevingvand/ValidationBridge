@@ -8,7 +8,7 @@ namespace ValidationBridge.Common
     {
         public const string ServerName = "ValidationBridge-Server";
         public const string BridgePath = @"C:\Users\Asus\Documents\Development\ValidationBridge\ValidationBridge\ValiationBridge.Bridge\bin\Debug\ValiationBridge.Bridge.exe";
-        public const bool ShowBridgeWindow = false;
+        public const bool ShowBridgeWindow = true;
         public static readonly Encoding ServerEncoding = new UTF8Encoding();
 
         public class Commands

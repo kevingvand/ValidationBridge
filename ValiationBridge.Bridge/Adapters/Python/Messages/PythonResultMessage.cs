@@ -22,9 +22,9 @@ namespace ValiationBridge.Bridge.Adapters.Python.Messages
             byte[] result = new byte[Value.Length + 4];
             result[0] = (byte)MessageType;
             result[1] = (byte)Type;
-            result[2] = (byte)(Value.Length / 256);
-            result[3] = (byte)(Value.Length & 255);
-            Value.CopyTo(result, 4);
+            var lengthBytes = BitConverter.GetBytes(Value.Length);
+            lengthBytes.CopyTo(result, 2);
+            Value.CopyTo(result, 6);
 
             return result;
         }
@@ -34,17 +34,17 @@ namespace ValiationBridge.Bridge.Adapters.Python.Messages
             if (Type.HasFlag(EType.ARRAY))
             {
                 var elementType = (Type & ~EType.ARRAY);
-                var arrayLength = Value[0] * 256 + Value[1];
+                var arrayLength = BitConverter.ToInt32(Value.Take(4).ToArray(), 0);
                 var result = Array.CreateInstance(elementType.GetSystemType(), arrayLength);
 
-                var currentIndex = 2;
+                var currentIndex = 4;
                 for (var i = 0; i < arrayLength; i++)
                 {
-                    var elementLength = Value[currentIndex] * 256 + Value[currentIndex + 1];
-                    var valueBytes = Value.Skip(currentIndex + 2).Take(elementLength).ToArray();
+                    var elementLength = BitConverter.ToInt32(Value.Skip(currentIndex).Take(4).ToArray(), 0);
+                    var valueBytes = Value.Skip(currentIndex + 4).Take(elementLength).ToArray();
                     result.SetValue(elementType.GetValue(valueBytes), i);
 
-                    currentIndex += elementLength + 2;
+                    currentIndex += elementLength + 4;
                 }
 
                 return result;

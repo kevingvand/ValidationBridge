@@ -195,15 +195,14 @@ namespace ValiationBridge.Bridge.Adapters.Python
             builder.AddLine("if not type_bytes.__len__() is 1:", 1);
             builder.AddLine("pipe.close()", 2);
             builder.AddLine("return", 2);
-            builder.DefineVariable("length_bytes", "pipe.read(2)", 1);
-            builder.DefineVariable("length", "length_bytes[0] * 256 + length_bytes[1]", 1);
+            builder.DefineVariable("length", "struct.unpack('l', pipe.read(4))[0]", 1);
             builder.DefineVariable("message", "pipe.read(length).decode(encoding)", 1);
             builder.AddLine("pipe.seek(0)", 1);
             builder.AddLine("process_message(pipe, type_bytes[0], message)", 1);
 
             // get_length_bytes function definition, get the byte array representation of a length
             builder.AddLine("def get_length_bytes(length):");
-            builder.AddLine("return struct.pack('B B', length // 256, length & 255)", 1);
+            builder.AddLine("return struct.pack('l', length)", 1);
 
             // write_error function definition, packs an error message and writes it back to the server
             builder.AddLine("def write_error(pipe, error):");
@@ -260,7 +259,7 @@ namespace ValiationBridge.Bridge.Adapters.Python
             builder.AddLine("except Exception as e:", 1);
             builder.AddLine("write_error(pipe, str(e))", 2);
             builder.AddLine("return", 2);
-            builder.AddLine("write_message(pipe, struct.pack('B B B B ?', 3, 2, 0, 1, True))", 1);
+            builder.AddLine("write_message(pipe, struct.pack('B B', 3, 2) + struct.pack('l', 1) + struct.pack('?', True))", 1);
 
             // process_message function definition, terminates if the server is unreachable and decides whether the input should be executed or evaluated.
             builder.AddLine("def process_message(pipe, type, message):");
@@ -291,14 +290,14 @@ namespace ValiationBridge.Bridge.Adapters.Python
             var messageType = (EPythonMessageType)_reader.ReadByte();
             if (messageType == EPythonMessageType.ERROR)
             {
-                var length = _reader.ReadByte() * 256 + _reader.ReadByte();
+                var length = _reader.ReadInt32();
                 var errorMessage = Constants.ServerEncoding.GetString(_reader.ReadBytes(length));
                 throw new PythonException(errorMessage);
             }
             else if (messageType == EPythonMessageType.RESULT)
             {
                 var resultType = (EType)_reader.ReadByte();
-                var length = _reader.ReadByte() * 256 + _reader.ReadByte();
+                var length = _reader.ReadInt32();
 
                 return new PythonResultMessage(resultType, _reader.ReadBytes(length));
             }

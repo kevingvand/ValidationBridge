@@ -141,7 +141,7 @@ namespace ConsoleFramework
 
             var plotter = Modules.Cast<IPlotter>(module);
 
-            var z = plotter.GetPoints(1000);
+            var z = plotter.GetPoints(100);
 
             //var test = Modules.GetModuleWithType<IVoltageSource>("Keithley2000");
 

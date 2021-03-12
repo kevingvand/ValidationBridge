@@ -63,6 +63,7 @@
     <Compile Include="Handlers\GlobalInvocationHandler.cs" />
     <Compile Include="Handlers\MessageHandler.cs" />
     <Compile Include="Handlers\ModuleInvocationHandler.cs" />
+    <Compile Include="IModuleAdapter.cs" />
     <Compile Include="InstanceManager.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -4,7 +4,7 @@ namespace ValidationBridge.Bridge.Services
 {
     public class LogService
     {
-        public bool IsEnabled { get; set; } = true;
+        public bool IsEnabled { get; set; } = false;
 
         public void LogError(string message)
         {

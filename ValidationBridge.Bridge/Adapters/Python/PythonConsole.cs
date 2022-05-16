@@ -52,8 +52,8 @@ namespace ValidationBridge.Bridge.Adapters.Python
 
         public void Stop()
         {
-            _server.Close();
-            ConsoleThread.Abort();
+            _server?.Close();
+            ConsoleThread?.Abort();
         }
 
         public bool IsInstalled(bool ignoreException = true)
@@ -133,16 +133,14 @@ namespace ValidationBridge.Bridge.Adapters.Python
             try
             {
                 using (Process process = Process.Start(start))
+                using (StreamReader reader = process.StandardOutput)
                 {
-                    using (StreamReader reader = process.StandardOutput)
-                    {
-                        string error = process.StandardError.ReadToEnd();
+                    string error = process.StandardError.ReadToEnd();
 
-                        if (error.Length > 0)
-                            throw new PythonException(error);
+                    if (error.Length > 0)
+                        throw new PythonException(error);
 
-                        return reader.ReadToEnd();
-                    }
+                    return reader.ReadToEnd();
                 }
             }
             catch (Win32Exception)

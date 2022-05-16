@@ -39,17 +39,21 @@ namespace ValidationBridge.Bridge.Adapters.Python
 
         public override List<string> LoadModule(string modulePath)
         {
-            var console = new PythonConsole("LOAD_MODULES");
+            var console = new PythonConsole("LOAD_PYTHON_MODULES");
 
             if (!console.IsInstalled())
             {
                 _logService.LogWarning($"Python is not installed or configured incorrectly, no Python modules can be loaded.");
+                console.Stop();
                 return new List<string>();
             }
 
             var moduleDirectoryInfo = new DirectoryInfo(modulePath);
             if (!moduleDirectoryInfo.Exists)
+            {
+                console.Stop();
                 return new List<string>();
+            }
 
             var validModules = GetValidModules(modulePath, console);
 
@@ -64,6 +68,7 @@ namespace ValidationBridge.Bridge.Adapters.Python
                 else LoadedModules.Add(moduleInfo.ModuleName, moduleProxyType);
             }
 
+            console.Stop();
             return validModules.Select(x => x.ModuleName).ToList();
         }
 
@@ -96,8 +101,31 @@ namespace ValidationBridge.Bridge.Adapters.Python
                         console.DefineVariable(instanceVariable, moduleInfo.ClassName + "()");
                     }
 
+                    // Parse the arguments to a format understandable for Python
+                    List<string> stringArguments = new List<string>();
+                    foreach (var argument in arguments)
+                    {
+                        // If the argument is an array, an array representation has to be created
+                        if (argument.GetType().IsArray)
+                        {
+                            var argumentArray = ((Array) argument).Cast<object>();
+
+                            // If the value is a string, it should be surrounded by quotes, otherwise it has to be converted using the invariant culture
+                            var arrayDefinition = argument.GetType().GetElementType() == typeof(string)
+                                ? string.Join(",", 
+                                    argumentArray.Select(element => $"\"{element}\""))
+                                : string.Join(",",
+                                    argumentArray.Select(element => Convert.ToString(element, CultureInfo.InvariantCulture)));
+                            stringArguments.Add($"[{arrayDefinition}]");
+                        }
+                        // If the argument is a string, it has to be surrounded by quotes
+                        else if (argument.GetType() == typeof(string)) stringArguments.Add($"\"{argument}\"");
+                        // If the argument is not an array or a string, it has to be converted using the invariant culture
+                        else stringArguments.Add(Convert.ToString(argument, CultureInfo.InvariantCulture));
+                    }
+
                     // Build the invocation command and evaluate.
-                    var argumentsString = string.Join(", ", arguments.Select(argument => Convert.ToString(argument, CultureInfo.InvariantCulture)));
+                    var argumentsString = string.Join(", ", stringArguments);
                     var result = console.Evaluate($"{instanceVariable}.{methodName}({argumentsString})");
 
                     // Get the return type of function from the interface, and return null if the return type is void
@@ -116,12 +144,17 @@ namespace ValidationBridge.Bridge.Adapters.Python
 
         private List<ProxyModuleInformation> GetValidModules(string modulePath, PythonConsole console)
         {
+            var modules = new List<ProxyModuleInformation>();
+
             // Retrieve the module package for the specified path and retrieve the package name
             DirectoryInfo moduleDirectoryInfo = new DirectoryInfo(modulePath);
             var packageName = moduleDirectoryInfo.Name;
 
             // Retrieve all python files within the package and convert them to namespaces
             var moduleImports = moduleDirectoryInfo.GetFiles("*.py").Select(moduleFile => $"{packageName}.{Path.GetFileNameWithoutExtension(moduleFile.Name)}");
+
+            // If there are no python files, we do not have to check for modules
+            if (!moduleImports?.Any() ?? false) return modules;
 
             // Start the interactive console
             console.Start();
@@ -145,7 +178,6 @@ namespace ValidationBridge.Bridge.Adapters.Python
             // Get number of candidate modules
             var moduleCandidateCount = console.Evaluate("moduleClasses.__len__()");
 
-            var modules = new List<ProxyModuleInformation>();
 
             // Loop throug all modules
             for (int moduleIndex = 0; moduleIndex < moduleCandidateCount; moduleIndex++)

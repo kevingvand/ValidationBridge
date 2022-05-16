@@ -83,7 +83,7 @@ namespace ValidationBridge.Bridge.Adapters.Matlab
 
                     // Parse information of executing instance
                     var instanceIdGuid = Guid.Parse(instanceId);
-                    var instanceVariable = $"m_{instanceIdGuid.ToString("N")}";
+                    var instanceVariable = $"m_{instanceIdGuid:N}";
 
                     // Check if the instance was already created in matlab, if not create it
                     matlab.Execute("if(exist('instances', 'var') == 0); instances = struct(); end;");
@@ -93,7 +93,8 @@ namespace ValidationBridge.Bridge.Adapters.Matlab
                     matlab.Execute($"moduleMetaInfo = metaclass(instances.{instanceVariable});");
                     matlab.Execute($@"moduleMetaMethodInfo = findobj(moduleMetaInfo.MethodList, ""Name"", ""{methodName}"")");
 
-                    var argumentString = string.Join(", ", arguments.Select(argument => GetArgumentAsString(argument)));
+                    var argumentStrings = arguments.Select(argument => GetArgumentAsString(argument, matlab)).ToList();
+                    var argumentString = string.Join(", ", argumentStrings);
 
                     int outputLength = (int)matlab.EvaluateExpression("outputLength", "size(moduleMetaMethodInfo.OutputNames, 1)");
 
@@ -117,6 +118,9 @@ namespace ValidationBridge.Bridge.Adapters.Matlab
                     }
 
                     matlab.Execute($@"instances.{instanceVariable}.{methodName}{(arguments.Length > 0 ? $"({argumentString})" : string.Empty)}");
+
+                    foreach (var argument in argumentStrings.Where(argument => argument.StartsWith("a_")))
+                        matlab.Execute($"clear {argument}");
                     return null;
                 }));
             }
@@ -126,11 +130,19 @@ namespace ValidationBridge.Bridge.Adapters.Matlab
             return moduleType;
         }
 
-        private string GetArgumentAsString(object argument)
+        private string GetArgumentAsString(object argument, Matlab matlab)
         {
-            if (argument is string) return $@"""{argument}""";
-            //TODO: if argument is array, add array definition;
-            return Convert.ToString(argument, CultureInfo.InvariantCulture);
+            // If the argument is an array, an array representation has to be created
+            if (argument.GetType().IsArray)
+            {
+                var arrayVariableName = $"a_{Guid.NewGuid():N}";
+                matlab.SetVariable(arrayVariableName, argument);
+                return arrayVariableName;
+            }
+            // If the argument is a string, it has to be surrounded by quotes
+            else if (argument is string) return $"\"{argument}\"";
+            // If the argument is not an array or a string, it has to be converted using the invariant culture
+            else return Convert.ToString(argument, CultureInfo.InvariantCulture);
         }
 
         private List<ProxyModuleInformation> GetValidModules(string path, string package)

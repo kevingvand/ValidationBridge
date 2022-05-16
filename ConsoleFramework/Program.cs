@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
+using InstrumentModules;
 using ValidationBridge.Common.Interfaces.Modules;
 using ValidationBridge.Invoker;
 
@@ -23,8 +25,49 @@ namespace ConsoleFramework
 
         //public delegate TResult Func<in T1, in T2, out TResult>(T1 arg1, T2 arg2);
 
+        public static string CSharpModulePath = @"C:\Users\Asus\Documents\Development\ValidationBridge\ValidationBridge\InstrumentModules\bin\Debug\InstrumentModules.dll";
+        public static string MATLABModulePath = @"C:\Users\Asus\Documents\Uni\THESIS\Benchmark\Modules\MATLAB\+Modules";
+        public static string PythonModulePath = @"C:\Users\Asus\Documents\Uni\THESIS\Benchmark\Modules\Python";
+
         static void Main(string[] args)
         {
+            Modules.LoadModule(CSharpModulePath);
+            Modules.LoadModule(MATLABModulePath);
+            Modules.LoadModule(PythonModulePath);
+
+            var modules = Modules.GetLoadedModules();
+
+            //Console.ReadKey();
+            var stopWatch = new Stopwatch();
+            var loadedModules = Modules.LoadModule(@"C:\Users\Asus\Documents\Development\ValidationBridge\ValidationBridge\InstrumentModules\bin\Debug\InstrumentModules.dll");
+
+            var csharpBenchmark = Modules.GetModuleWithType<IBenchmark>("CSharpBenchmark");
+            var csharpDirect = new CsharpBenchmark();
+
+            //stopWatch.Restart();
+            //for(int i = 0; i < 1000; i++)
+            //    csharpBenchmark.Add(i, 5);
+            //stopWatch.Stop();
+            //Console.WriteLine("Elapsed (ms): " + stopWatch.ElapsedMilliseconds + " - Result: ");
+
+            //stopWatch.Restart();
+            //for (int i = 0; i < 1000; i++)
+            //    csharpDirect.Add(i, 5);
+            //stopWatch.Stop();
+            //Console.WriteLine("Elapsed (ms): " + stopWatch.ElapsedMilliseconds + " - Result: ");
+
+
+            var input = Enumerable.Range(1, 5000).ToArray();
+
+            stopWatch.Restart();
+            var res = csharpBenchmark.DelayedAddToArray(input, 5);
+            //var res = csharpBenchmark.Add(8, 2);
+            stopWatch.Stop();
+
+            Console.Write(("Elapsed (ms):" + stopWatch.ElapsedMilliseconds));
+
+            Debugger.Break();
+
 
             //var a = new
             //{
@@ -133,27 +176,27 @@ namespace ConsoleFramework
 
             //var loadedModules = Modules.LoadModule(@"C:\Users\Asus\Documents\Development\ValidationBridge\ValidationBridge\InstrumentModules\bin\Debug\InstrumentModules.dll");
             //var matlabModules = Modules.LoadModule(@"C:\Users\Asus\Documents\Development\ValidationBridge\ValidationBridge\ExternalModules\+Instruments");
-            var pythonModules = Modules.LoadModule(@"C:\Users\Asus\PycharmProjects\ValidationBridgeFramework\Modules");
+            //var pythonModules = Modules.LoadModule(@"C:\Users\Asus\PycharmProjects\ValidationBridgeFramework\Modules");
 
-            var modules = Modules.GetLoadedModules();
+            //var modules = Modules.GetLoadedModules();
 
-            var module = Modules.GetModule("Keithley2001");
+            //var module = Modules.GetModule("Keithley2001");
 
-            var plotter = Modules.Cast<IPlotter>(module);
+            //var plotter = Modules.Cast<IPlotter>(module);
 
-            var z = plotter.GetPoints(100);
+            //var z = plotter.GetPoints(100);
 
-            //var test = Modules.GetModuleWithType<IVoltageSource>("Keithley2000");
+            ////var test = Modules.GetModuleWithType<IVoltageSource>("Keithley2000");
 
-            //var module = Modules.GetModule("KeysightB2901A2");
-            var source = Modules.Cast<IVoltageSource>(module);
-            var sensor = Modules.Cast<IVoltageSensor>(module);
+            ////var module = Modules.GetModule("KeysightB2901A2");
+            //var source = Modules.Cast<IVoltageSource>(module);
+            //var sensor = Modules.Cast<IVoltageSensor>(module);
 
-            var x = source.GetDescription();
+            //var x = source.GetDescription();
 
-            var val1 = sensor.GetDCVoltage();
-            source.SetDCVoltage(14);
-            var val2 = sensor.GetDCVoltage();
+            //var val1 = sensor.GetDCVoltage();
+            //source.SetDCVoltage(14);
+            //var val2 = sensor.GetDCVoltage();
 
             //var test = Modules.GetModuleWithType<IVoltageSensor>("KeysightB2901A2");
 

@@ -79,12 +79,15 @@ namespace ValidationBridge.Common.Messages
 
                 var values = valueArrays.SelectMany(valueArray => valueArray).ToArray();
 
-                var result = new byte[values.Length + 5];
+                var result = new byte[values.Length + 9];
                 result[0] = Convert.ToByte(Type);
 
+                var byteLengthBytes = BitConverter.GetBytes(values.Length + 4);
+                byteLengthBytes.CopyTo(result, 1);
+
                 var lengthBytes = BitConverter.GetBytes(array.Length);
-                lengthBytes.CopyTo(result, 1);
-                values.CopyTo(result, 5);
+                lengthBytes.CopyTo(result, 5);
+                values.CopyTo(result, 9);
 
                 return result;
             }
@@ -94,16 +97,14 @@ namespace ValidationBridge.Common.Messages
         private byte[] GetValueArray(EType type, dynamic value, bool isArrayElement = false)
         {
             var valueArray = GetBytes(type, value);
-            var resultArray = new byte[valueArray.Length + (isArrayElement ? 2 : 3)];
+            var resultArray = new byte[valueArray.Length + (isArrayElement ? 4 : 5)];
 
-            var blockLength = (byte)(valueArray.Length / 256);
-            var byteLength = (byte)(valueArray.Length & 255);
+            var byteLengthBytes = BitConverter.GetBytes(valueArray.Length);
+            byteLengthBytes.CopyTo(resultArray, isArrayElement ? 0 : 1);
 
-            resultArray[0] = isArrayElement ? blockLength : Convert.ToByte(type);
-            resultArray[1] = isArrayElement ? byteLength : blockLength;
-            if (!isArrayElement) resultArray[2] = byteLength;
+            if (!isArrayElement) resultArray[0] = Convert.ToByte(type);
 
-            valueArray.CopyTo(resultArray, isArrayElement ? 2 : 3);
+            valueArray.CopyTo(resultArray, isArrayElement ? 4 : 5);
             return resultArray;
         }
 
@@ -152,18 +153,18 @@ namespace ValidationBridge.Common.Messages
 
             if (type.HasFlag(EType.ARRAY))
             {
-                //var elementCount = bytes[1] * 256 + bytes[2];
-                var elementCount = BitConverter.ToInt32(bytes.Skip(1).Take(4).ToArray(), 0);
+                var elementCount = BitConverter.ToInt32(bytes.Skip(5).Take(4).ToArray(), 0);
                 var elementType = type & ~EType.ARRAY;
 
                 var result = Array.CreateInstance(elementType.GetSystemType(), elementCount);
 
-                var currentIndex = 5;
+                var currentIndex = 9;
                 for (var i = 0; i < elementCount; i++)
                 {
-                    var elementLength = bytes[currentIndex] * 256 + bytes[currentIndex + 1];
-                    var valueBytes = bytes.Skip(currentIndex + 2).Take(elementLength).ToArray();
-                    currentIndex += elementLength + 2;
+                    var elementLengthBytes = bytes.Skip(currentIndex).Take(4).ToArray();
+                    var elementLength = BitConverter.ToInt32(elementLengthBytes, 0);
+                    var valueBytes = bytes.Skip(currentIndex + 4).Take(elementLength).ToArray();
+                    currentIndex += elementLength + 4;
 
                     result.SetValue(GetValue(elementType, valueBytes), i);
                 }
@@ -172,7 +173,8 @@ namespace ValidationBridge.Common.Messages
             }
             else
             {
-                var valueBytes = bytes.Skip(3).ToArray();
+                var lengthBytes = bytes.Skip(1).Take(4).ToArray();
+                var valueBytes = bytes.Skip(5).Take(BitConverter.ToInt32(lengthBytes, 0)).ToArray();
 
                 return new Argument(type, GetValue(type, valueBytes));
             }

@@ -76,15 +76,14 @@ namespace ValidationBridge.Proxy
 
         private void Compile()
         {
-            if (!Compiled)
-            {
-                Compiled = true;
+            if (Compiled) return;
 
-                _compiledType = Type.GetType(_typeBuilder.AssemblyQualifiedName);
+            Compiled = true;
 
-                if (_compiledType == null)
-                    _compiledType = _typeBuilder.CreateType();
-            }
+            _compiledType = Type.GetType(_typeBuilder.AssemblyQualifiedName);
+
+            if (_compiledType == null)
+                _compiledType = _typeBuilder.CreateType();
         }
 
         private void DefineProxyForType(Type type, ProxyFunction methodBody)

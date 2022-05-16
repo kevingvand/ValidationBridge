@@ -104,7 +104,8 @@ namespace ValidationBridge.Common.Messages
             argumentIndex += 2;
             for (int i = 0; i < argumentCount; i++)
             {
-                var argumentLength = bytes[argumentIndex + 1] * 256 + bytes[argumentIndex + 2] + 3;
+                var argumentLengthBytes = bytes.Skip(argumentIndex + 1).Take(4).ToArray();
+                var argumentLength = BitConverter.ToInt32(argumentLengthBytes, 0) + 5;
                 arguments[i] = Argument.CreateFromBytes(bytes.Skip(argumentIndex).Take(argumentLength).ToArray());
                 argumentIndex += argumentLength;
             }
